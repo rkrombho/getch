@@ -29,20 +29,22 @@ testkey3=myproduct_testvalue3"""
     }
 
     def cleanup() {
+      def workdir = System.getProperty("java.io.tmpdir") + '/getchtest'
+      new File(workdir).delete()
     }
   
-    void "test recursive upwards searching property"() {
+    void "test recursive upwards searching property"(String host, String key, String value) {
       setup:
-      def service = new FileSystemTreeService()
-      expect:
-      service.findValue(host, key) == value 
+      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+      expect: 
+      service.findValue(host, key) == value
       where:
-      host        | key        || value 
+      host | key || value 
       'hostname1' | 'testkey1' || 'hostname1_testvalue1'
-      'hostname1' | 'testkey2' || 'web_testvalue1'
-      'hostname1' | 'testkey3' || 'myproduct_testvalue1'
+      'hostname1' | 'testkey2' || 'web_testvalue2'
+      'hostname1' | 'testkey3' || 'myproduct_testvalue3'
       'hostname1' | 'testkey4' || null
-      'hostname1' | 'testkey2' || null
+      'hostname2' | 'testkey2' || null
       'hostname2' | 'testkey1' || null
 
     }
