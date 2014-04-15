@@ -76,7 +76,7 @@ server:
 curl -X GET http://mygetchhost:port/getch/mykey
 ```
 
-With hierarchy setup as desceived above, if the query arrives 
+With the hierarchy setup as desceived above, if the query arrives 
 from `hostname1`, Getch will search through the content of 
 the following files in that order:
 ```bash
