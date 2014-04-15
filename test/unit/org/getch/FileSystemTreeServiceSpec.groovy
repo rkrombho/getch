@@ -43,7 +43,7 @@ testkey3=myproduct_testvalue3"""
       'hostname1' | 'testkey1' || 'hostname1_testvalue1'
       'hostname1' | 'testkey2' || 'web_testvalue2'
       'hostname1' | 'testkey3' || 'myproduct_testvalue3'
-      'hostname1' | 'testkey4' || null
+      'hostname1' | 'testkey355' || null
       'hostname2' | 'testkey2' || null
       'hostname2' | 'testkey1' || null
     }
@@ -64,6 +64,6 @@ testkey6:
       host | key || value 
       'hostname1' | 'testkey4' || 'testvalue4'
       'hostname1' | 'testkey5' || 'testvalue5 with whitespaces'
-      'hostname1' | 'testkey3' || ['sequencevalue1', 'sequencevalue2']
+      'hostname1' | 'testkey6' || 'sequencevalue1,sequencevalue2'
     }
 }

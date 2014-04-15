@@ -1,14 +1,17 @@
 package org.getch
 
+import org.ho.yaml.Yaml
+
 /**
- * Implementation of a Reader for Java Properties files
+ * Implementation of a Reader for Yaml files.
+ * Supported are base-level mapping and mappings to sequences
  *
  * @author Robert Krombholz
  */
-class PropertyFileReader implements FileReader {
+class YamlFileReader implements FileReader {
   //used to implement the Chain of Responsibilities pattern
   private FileReader nextReader
-  public PropertyFileReader(FileReader reader) {
+  public YamlFileReader(FileReader reader) {
     nextReader = reader
   }
   
@@ -19,10 +22,11 @@ class PropertyFileReader implements FileReader {
    * @param key The key to load from the Properties file
    */
   public String getValueForKey(File file, String key) {
-    if (file.name.endsWith('.properties')) {
-      def props = new Properties()
-      props.load(file.newInputStream())
-      return props."$key"
+    if (file.name.endsWith('.yaml') || file.name.endsWith('.yml')) {
+      def yaml = Yaml.load(file)
+      def value = yaml."$key"
+      //if the key references a collection than join this with a ,
+      return value instanceof Collection ? value.join(',') : value
     }
     else {
       return nextReader?.getValueForKey(file, key)
@@ -30,8 +34,7 @@ class PropertyFileReader implements FileReader {
   }
 
   public String getMimeType() {
-    // the type text/x-java-properties exists but is not widely used
-    return 'text/plain'
+    return 'text/yaml'
   }
 }
 

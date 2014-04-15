@@ -21,7 +21,7 @@ class FileSystemTreeService {
      * param fromDir the directory to upwards from 
      * param key the key to search for in all config.properties
      */
-    def findValue(String fromDir, String key) {
+    String findValue(String fromDir, String key) {
       def baseDir = new File(grailsApplication.config.getch.base.directory)
       if (!baseDir.canRead()) {
         throw new IOException("Can not read ${baseDir.absolutePath}")
@@ -33,7 +33,6 @@ class FileSystemTreeService {
           startDir= it
         }
       }
-      println "startDir = $startDir (with fromDir = $fromDir)"
       //return null if the searched directory does not exist in the tree
       //or the result of findValueUpwards in case it does
       return startDir ? findValueUpwards(startDir, key, baseDir) : null
@@ -50,9 +49,11 @@ class FileSystemTreeService {
      */
     private findValueUpwards(File dir, String key, File baseDir) {
       String result
+      //Initialize the file Reader. This delegates reading to the correct reader implmentation
+      //depending on the file suffix
+      FileReader reader = FileReaderFactory.createNewInstance()
       //for all properties file in the current directory
-      dir.eachFileMatch(FileType.FILES, ~/.*\.properties/) {
-        FileReader reader = FileReaderFactory.createNewInstance()
+      dir.eachFile(FileType.FILES) {
         //only if we don't already have a result (we match the first)
         if (!result) {
           //save the property - may be null but that's okay

@@ -11,6 +11,6 @@ class FileReaderFactory {
 
   public static FileReader createNewInstance() {
     //currently we only have one implementation
-    return new PropertyFileReader()
+    return new PropertyFileReader(new YamlFileReader())
   }
 }
