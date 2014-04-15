@@ -46,6 +46,24 @@ testkey3=myproduct_testvalue3"""
       'hostname1' | 'testkey4' || null
       'hostname2' | 'testkey2' || null
       'hostname2' | 'testkey1' || null
+    }
 
+    void "test search key in yaml file"(String host, String key, String value) {
+      setup:
+        def yamlFile = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/config.yaml')
+        yamlFile.text='''
+testkey4: testvalue4
+testkey5: testvalue5 with whitespaces
+testkey6:
+  - sequencevalue1
+  - sequencevalue2
+'''
+      expect:
+      service.findValue(host, key) == value
+      where:
+      host | key || value 
+      'hostname1' | 'testkey4' || 'testvalue4'
+      'hostname1' | 'testkey5' || 'testvalue5 with whitespaces'
+      'hostname1' | 'testkey3' || ['sequencevalue1', 'sequencevalue2']
     }
 }
