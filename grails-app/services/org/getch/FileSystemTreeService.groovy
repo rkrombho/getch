@@ -26,13 +26,14 @@ class FileSystemTreeService {
       if (!baseDir.canRead()) {
         throw new IOException("Can not read ${baseDir.absolutePath}")
       }
-      def startDir 
+      def startDir = null
       //find the first matching directory
       baseDir.eachDirRecurse {
         if( !startDir && it.name == fromDir ) {
           startDir= it
         }
       }
+      println "startDir = $startDir (with fromDir = $fromDir)"
       //return null if the searched directory does not exist in the tree
       //or the result of findValueUpwards in case it does
       return startDir ? findValueUpwards(startDir, key, baseDir) : null
@@ -51,23 +52,19 @@ class FileSystemTreeService {
       String result
       //for all properties file in the current directory
       dir.eachFileMatch(FileType.FILES, ~/.*\.properties/) {
-        //load the properties
-        def props = new Properties()
-        props.load(it.newInputStream())
+        FileReader reader = FileReaderFactory.createNewInstance()
         //only if we don't already have a result (we match the first)
         if (!result) {
-          //save the property
-          result = props."$key" 
+          //save the property - may be null but that's okay
+          result = reader.getValueForKey(it, key)
         }
       }
       //return the result if we found one or if we reached the top-level dir
       //call the method recusively otherwhise
       if (result == null && dir.name != baseDir.name && dir.parentFile != null) {
-        println "rec call (${dir.parentFile}, $key, $baseDir)"
         return findValueUpwards(dir.parentFile, key, baseDir)
       }
       else {
-        println "returning $result"
         return result
       }
     }
