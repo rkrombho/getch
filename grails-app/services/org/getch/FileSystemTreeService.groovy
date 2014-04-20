@@ -2,6 +2,7 @@ package org.getch
 
 import grails.transaction.Transactional
 import groovy.io.FileType
+import java.net.InetAddress
 
 /**
  * Main Service class of Getch implementing all required interactions 
@@ -68,5 +69,17 @@ class FileSystemTreeService {
       else {
         return result
       }
+    }
+
+    /**
+     * does a reverse DNS lookup and returns the hostname for the given
+     * textual representation of the IP address.
+     *
+     * @param ip Textual representation of the IP
+     */
+    public String getHostnameFromIP(String ip, boolean stripDomainName = true) {
+      def fqdn = InetAddress.getByName(ip).hostName
+      // return the hostname only unless the stripDomainName flag is set to false
+      return stripDomainName ? fqdn.split("\\.")[0] : fqdn
     }
 }

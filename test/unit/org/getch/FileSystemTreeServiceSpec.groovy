@@ -66,4 +66,11 @@ testkey6:
       'hostname1' | 'testkey5' || 'testvalue5 with whitespaces'
       'hostname1' | 'testkey6' || 'sequencevalue1,sequencevalue2'
     }
+
+    void "test get hostname from IP"() {
+      setup:
+      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+      expect:
+      service.getHostnameFromIP('127.0.0.1') == 'localhost'
+    }
 }
