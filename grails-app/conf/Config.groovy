@@ -119,3 +119,14 @@ log4j = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 }
+
+
+//Getch specific configuration
+environments {
+  development {
+    getch.base.directory = '/tmp/getchdev'
+  }
+  production {
+    getch.base.directory = System.getProperty("user.home") + '/getch'
+  }
+}

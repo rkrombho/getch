@@ -34,8 +34,10 @@ class FileSystemTreeService {
           startDir= it
         }
       }
+      println fromDir
       //return null if the searched directory does not exist in the tree
       //or the result of findValueUpwards in case it does
+      //TODO: seperate those statements to make it possible to search for other start dirs with the same name. Currently we stop at the first found dir
       return startDir ? findValueUpwards(startDir, key, baseDir) : null
     }
     
