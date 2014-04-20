@@ -4,6 +4,10 @@ Getch
 Getch is a hierarchical configuration store queryable over a 
 simple HTTP interface.
 
+Project Status
+==============
+This project is in a very early protptype state. Please don't use it anywhere near a productive environment.
+
 Why?
 ====
 Getch is insipired by [Hiera](https://github.com/puppetlabs/hiera) and copies the concept
@@ -30,8 +34,8 @@ You can place all sorts of different configuration files on all layers
 of your directory tree structure and the query will find the first occurance
 of the 'key' by traversing through all files upwards in the tree.
 
-If it finds a property / yaml entry / xml element / xml attribute 
-somewhere in the tree it will return the corresponding value.
+If it finds a property / yaml entry somewhere in the tree 
+it will return the corresponding value.
 
 Furthermore if the key represnets a filename within the directory structure
 (e.g. config.xml) it will return the whole file (with the correct MIME type setted) 
@@ -65,7 +69,7 @@ common
 ```
 _**note:** in this sample contains structure only single .properties files 
 but you can have as many files on every level of the tree as you want.
-Additionally you can use [.properties](http://en.wikipedia.org/wiki/.properties) (key=value), [yaml](http://www.yaml.org/), [json](http://www.json.org/) or [xml](http://www.w3schools.com/xml/xml_whatis.asp) files
+Additionally you can use [.properties](http://en.wikipedia.org/wiki/.properties) (key=value), [yaml](http://www.yaml.org/), files
 to store configuration values in._
 
 Query single values
