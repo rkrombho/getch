@@ -8,9 +8,8 @@ class UrlMappings {
             }
         }
         */
-        "/encrypt/$value"(controller:'encryption')
+        "/encrypt"(controller:'encryption')
         "/$key"(controller:'query')
-        "/"(view:"/index")
         "500"(view:'/error')
 	}
 }
