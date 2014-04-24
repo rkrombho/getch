@@ -50,8 +50,8 @@ testkey3=myproduct_testvalue3"""
 
     void "test search key in yaml file"(String host, String key, String value) {
       setup:
-        def yamlFile = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/config.yaml')
-        yamlFile.text='''
+      def yamlFile = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/config.yaml')
+      yamlFile.text='''
 testkey4: testvalue4
 testkey5: testvalue5 with whitespaces
 testkey6:
@@ -73,4 +73,18 @@ testkey6:
       expect:
       service.getHostnameFromIP('127.0.0.1') == 'localhost'
     }
+
+   void "test get encrypted value"() {
+      setup:
+      def yamlFile = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/config.yaml')
+      yamlFile.text='''
+testkey7: sec:testvalue7
+'''
+      def fakeTextEncryptor = new Expando()
+      fakeTextEncryptor.decrypt = { String st -> return st }
+      def service = new FileSystemTreeService(grailsApplication:grailsApplication, textEncryptor: fakeTextEncryptor)
+      expect:
+      service.findValue('hostname1', 'testkey7') == 'testvalue7'
+
+   }
 }

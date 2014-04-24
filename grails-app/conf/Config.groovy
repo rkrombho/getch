@@ -7,9 +7,9 @@
 //                             "file:${userHome}/.grails/${appName}-config.properties",
 //                             "file:${userHome}/.grails/${appName}-config.groovy"]
 
-// if (System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
+if (System.properties["${appName}.config.location"]) {
+    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
+}
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
@@ -125,8 +125,10 @@ log4j = {
 environments {
   development {
     getch.base.directory = '/tmp/getchdev'
+    getch.encryption.password = 'secret'
   }
-  production {
-    getch.base.directory = System.getProperty("user.home") + '/getch'
+  test {
+    getch.base.directory = '/tmp/getchdev'
+    getch.encryption.password = 'secret'
   }
 }
