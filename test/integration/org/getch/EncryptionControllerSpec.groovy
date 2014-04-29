@@ -21,7 +21,8 @@ class EncryptionControllerSpec extends Specification {
       setup:
       def controller = new EncryptionController(textEncryptor:textEncryptor)
       when:
-      controller.encrypt('testvalue')
+      controller.request.addParameter('value', 'testvalue')
+      controller.encrypt()
       then:
       textEncryptor.decrypt(controller.response.contentAsString) == 'testvalue'
     }
