@@ -9,6 +9,7 @@ class UrlMappings {
         }
         */
         "/encrypt"(controller:'encryption')
+        "/list"(controller:'query', action:'list')
         "/$key"(controller:'query')
         "500"(view:'/error')
 	}

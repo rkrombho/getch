@@ -124,11 +124,11 @@ log4j = {
 //Getch specific configuration
 environments {
   development {
-    getch.base.directory = '/tmp/getchdev'
+    getch.base.directory = System.getProperty("java.io.tmpdir") + '/getchdev'
     getch.encryption.password = 'secret'
   }
   test {
-    getch.base.directory = '/tmp/getchdev'
+    getch.base.directory = System.getProperty("java.io.tmpdir") + '/getchtest'
     getch.encryption.password = 'secret'
   }
 }

@@ -28,6 +28,23 @@ class PropertyFileReader implements FileReader {
       return nextReader?.getValueForKey(file, key)
     }
   }
+ 
+  /**
+   * Returns all proporties of this file as a Map
+   * @param file the file to get the values from
+   */
+  public Map getAllValues(File file) {
+    if (file.name.endsWith('.properties')) {
+      def props = new Properties()
+      props.load(file.newInputStream())
+      //we can just return the Properties object because it implements Map
+      return props
+    }
+    else {
+      return nextReader?.getAllValues(file)
+    }
+
+  }
 
   public String getMimeType() {
     // the type text/x-java-properties exists but is not widely used

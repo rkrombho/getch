@@ -2,6 +2,7 @@ package org.getch
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
+import org.apache.commons.io.FileUtils
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
@@ -30,7 +31,7 @@ testkey3=myproduct_testvalue3"""
 
     def cleanup() {
       def workdir = System.getProperty("java.io.tmpdir") + '/getchtest'
-      new File(workdir).delete()
+      FileUtils.deleteDirectory(new File(workdir));
     }
   
     void "test recursive upwards searching property"(String host, String key, String value) {

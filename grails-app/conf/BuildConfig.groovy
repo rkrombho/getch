@@ -52,6 +52,8 @@ grails.project.dependency.resolution = {
         // runtime 'org.postgresql:postgresql:9.3-1100-jdbc41'
         compile 'org.jyaml:jyaml:1.3'
         compile 'org.jasypt:jasypt:1.9.2'
+	compile 'org.apache.commons:commons-io:1.3.2'
+
     }
 
     plugins {

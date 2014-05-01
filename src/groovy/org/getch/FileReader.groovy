@@ -9,7 +9,7 @@ package org.getch
 interface FileReader {
  
   /**
-   * This methos should check the file, see if it can handle it, 
+   * This method should check the file, see if it can handle it, 
    * and if so return the value of the provided key.
    * If the key does not exist it should return null.
    * If the implementing reader does not feel responsible to handle a given
@@ -20,6 +20,16 @@ interface FileReader {
    * @param key The Key to look for in the file 
    */
   public String getValueForKey(File file, String key);
+
+  /**
+   * This method should check the file, see if it can handle it and if so return a flat 
+   * map of key - value pairs from the given file.
+   * THe way of flattning out potentially hierarchical file contenty (e.g. from XML or YAML) 
+   * is up to the implementing class.
+   *
+   *@param file the file to list all values from
+   */
+  public Map getAllValues(File file);
 
   /**
    * Should return the MIME type for the file types that an implementing 

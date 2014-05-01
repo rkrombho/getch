@@ -33,6 +33,23 @@ class YamlFileReader implements FileReader {
     }
   }
 
+  /**
+   * Recieve all values from a given file
+   *
+   * @param file The file that should be read
+   */
+  public Map getAllValues(File file) {
+    if (file.name.endsWith('.yaml') || file.name.endsWith('.yml')) {
+      def yaml = Yaml.load(file)
+      //return the loaded yaml mapping as a java Map or null if it e.g. was a sequence at the top-level
+      return yaml 
+    }
+    else {
+      return nextReader?.getAllValues(file)
+    }
+  }
+    
+
   public String getMimeType() {
     return 'text/yaml'
   }
