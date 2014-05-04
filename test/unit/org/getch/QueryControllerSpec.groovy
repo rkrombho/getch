@@ -30,6 +30,7 @@ testkey1=testvalue1"""
     void "test query single value from properties file"() {
       setup:
       controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
+      controller.nameResolutionService = new NameResolutionService()
       when:
       request.remoteAddr = '127.0.0.1'
       controller.query('testkey1')
@@ -42,6 +43,7 @@ testkey1=testvalue1"""
     void "test query with non-existing key"() {
       setup:
       controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
+      controller.nameResolutionService = new NameResolutionService()
       when:
       controller.query('blahkey')
       then:
@@ -52,6 +54,7 @@ testkey1=testvalue1"""
     void "test list action"() {
       setup:
       controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
+      controller.nameResolutionService = new NameResolutionService()
       def yamlFile = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/localhost/config.yaml')
       yamlFile.text='''
 testkey7: testvalue7

@@ -11,6 +11,7 @@ import grails.converters.XML
 class QueryController {
 
   def fileSystemTreeService
+  def nameResolutionService
   static defaultAction = "query"
 
 
@@ -23,12 +24,12 @@ class QueryController {
     //try with the requesters IP/hostname if no param is given
     if (!params.host) {
       //get the hostname of the requester without the domainname
-      def host = fileSystemTreeService.getHostnameFromIP(request.remoteAddr)
+      def host = nameResolutionService.getHostnameFromIP(request.remoteAddr)
       //try to get the value witht the hostname
       value = fileSystemTreeService.findValue(host, key) 
       if (!value) {
         //try with the fully qualified hostname
-        def fqdn = fileSystemTreeService.getHostnameFromIP(request.remoteAddr, false)
+        def fqdn = nameResolutionService.getHostnameFromIP(request.remoteAddr, false)
         value = fileSystemTreeService.findValue(fqdn, key)
       }
     }
@@ -53,13 +54,13 @@ class QueryController {
     def values
     if(!params.host) {
       //get the hostname of the requester without the domainname
-      def host = fileSystemTreeService.getHostnameFromIP(request.remoteAddr)
+      def host = nameResolutionService.getHostnameFromIP(request.remoteAddr)
       println host
       values = fileSystemTreeService.listValues(host) 
       //in case we didn't find anything for the given host
       if(!values) {
         //try with the fully qualified hostname
-        def fqdn = fileSystemTreeService.getHostnameFromIP(request.remoteAddr, false)
+        def fqdn = nameResolutionService.getHostnameFromIP(request.remoteAddr, false)
         values = fileSystemTreeService.listValues(fqdn)
       }
     }

@@ -87,13 +87,6 @@ testkey6:
       'hostname1' | 'testkey6' || 'sequencevalue1,sequencevalue2'
     }
 
-    void "test get hostname from IP"() {
-      setup:
-      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
-      expect:
-      service.getHostnameFromIP('127.0.0.1') == 'localhost'
-    }
-
    void "test get encrypted value"() {
       setup:
       def yamlFile = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/config.yaml')
