@@ -35,9 +35,6 @@ class FileSystemTreeService {
           startDir= it
         }
       }
-      //return null if the searched directory does not exist in the tree
-      //or the result of findValueUpwards in case it does
-      //TODO: seperate those statements to make it possible to search for other start dirs with the same name. Currently we stop at the first found dir
       def returnValue 
       if(startDir) {
         //first search downwards in the tree from the startDir
