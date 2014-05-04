@@ -69,6 +69,7 @@ testkey1=hostname1_testvalue1
 
     void "test search key in yaml file"(String host, String key, String value) {
       setup:
+      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
       def yamlFile = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/config.yaml')
       yamlFile.text='''
 testkey4: testvalue4
@@ -104,6 +105,22 @@ testkey7: sec:testvalue7
       def service = new FileSystemTreeService(grailsApplication:grailsApplication, textEncryptor: fakeTextEncryptor)
       expect:
       service.findValue('hostname1', 'testkey7') == 'testvalue7'
-
+   }
+ 
+   void "test findValue returns lowest occurance of same key"() {
+      setup:
+      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+      def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/component1/')
+      directory.mkdirs()
+      new File(directory, 'config.properties').text = '''
+testkey11=wrongvalue
+'''
+      def subdirectory = new File(directory, 'subcomponent1')
+      subdirectory.mkdirs()
+      new File(subdirectory, 'config.yaml').text = '''
+testkey11: rightvalue
+'''
+      expect:
+      service.findValue('hostname1', 'testkey11') == 'rightvalue'
    }
 }
