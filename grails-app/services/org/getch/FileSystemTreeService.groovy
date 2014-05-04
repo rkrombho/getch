@@ -41,7 +41,14 @@ class FileSystemTreeService {
       //TODO: seperate those statements to make it possible to search for other start dirs with the same name. Currently we stop at the first found dir
       def returnValue 
       if(startDir) {
-        returnValue = findValueUpwards(startDir, key, baseDir) 
+        //first search downwards in the tree from the startDir
+        returnValue = findValueDownwards(startDir, key)
+        //if nothing was found 
+        if(!returnValue) {
+          //search upwards
+          returnValue = findValueUpwards(startDir, key, baseDir) 
+        }
+        //if the found value is encrypted, decrypt it
         if(returnValue && returnValue?.startsWith('sec:')) {
           returnValue = textEncryptor.decrypt(returnValue.split('sec:')[1])
         }
@@ -70,22 +77,32 @@ class FileSystemTreeService {
       }
       def returnValue 
       if(startDir) {
-	returnValue = findValueUpwards(startDir, null, baseDir) 
-        //decrypt all potentially encrypted values
+        //first search downwards in the tree from the startDir
+        returnValue = findValueDownwards(startDir, null)
+        if (!returnValue) {
+          returnValue = [:]
+        }
+        //then add all valued searching upwards
+	returnValue += findValueUpwards(startDir, null, baseDir) 
+        //iterate over the returned map and change some values
         returnValue = returnValue?.collectEntries { key, value -> 
           def newValue 
           if(value instanceof String) {
+            //decrypt all potentially encrypted values
             newValue = value?.startsWith('sec:') ? textEncryptor.decrypt(value.split('sec:')[1]) : value
           }
           else if (value instanceof Collection) {
+            //joing potential collection to a comma seperated string
             newValue = value.join(',')
           }
           else {
+            //use the toString representation of all other values
             newValue = value.toString()
           }
           [key, newValue]
         }
       }
+      //return the map alpahbetically sorted
       return returnValue.sort()
     }
 
@@ -151,4 +168,40 @@ class FileSystemTreeService {
       }
     }
 
+    /**
+     * scans through all supported configuration files downwards in the tree.
+     * if a key is specified than all the single value is returned.
+     * if the key is null, all supported config files are being read into a map which is then returned.
+     *
+     * @param dir The directory to search from
+     * @param key the key to look for - leave this empty to get a map of all values
+     * @return A String representing the value of the queried key or a Map representing all configuration values in case the key was null.
+     */
+    private def findValueDownwards(File dir, String key) {
+      //Initialize the file Reader. This delegates reading to the correct reader implmentation
+      //depending on the file suffix
+      FileReader reader = FileReaderFactory.createNewInstance()
+      def result
+      //every file downwards recursively
+      dir.eachFileRecurse(FileType.FILES) {
+        //only if a key was provided and we didn't yet find the result
+        if (key && !result) {
+          //save the property - may be null but that's okay
+          result = reader.getValueForKey(it, key)
+        }
+        //if no key was provided we want to list all config values
+        else if (!key)  {
+          //initialize a map as the result
+          if (!result) {
+            result = [:]
+          }
+          //add all values to the result
+          def allValues = reader.getAllValues(it)
+          if(allValues) {
+            result += allValues
+          }
+        }
+      }
+      return result
+    }
 }

@@ -31,7 +31,7 @@ testkey3=myproduct_testvalue3"""
 
     def cleanup() {
       def workdir = System.getProperty("java.io.tmpdir") + '/getchtest'
-      FileUtils.deleteDirectory(new File(workdir));
+      FileUtils.deleteDirectory(new File(workdir))
     }
   
     void "test recursive upwards searching property"(String host, String key, String value) {
@@ -47,6 +47,24 @@ testkey3=myproduct_testvalue3"""
       'hostname1' | 'testkey355' || null
       'hostname2' | 'testkey2' || null
       'hostname2' | 'testkey1' || null
+    }
+
+    void "test resursive downwards search for single value"() {
+      setup:
+      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+      def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/somecomponent/')
+      directory.mkdirs()
+      new File(directory, 'config.properties').text = '''
+testkey10=testvalue10
+testkey1=hostname1_testvalue1
+'''
+      expect: 
+      service.findValue(host, key) == value
+      where:
+      host | key || value 
+      'hostname1' | 'testkey10' || 'testvalue10'
+      'hostname1' | 'testkey1' || 'hostname1_testvalue1'
+
     }
 
     void "test search key in yaml file"(String host, String key, String value) {

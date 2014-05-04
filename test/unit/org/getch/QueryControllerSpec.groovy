@@ -67,6 +67,7 @@ testkey10=testvalue10
       controller.list()
       then:
       response.status == 200
+      println response.text
       response.text == '''testkey1=testvalue1\ntestkey10=testvalue10\ntestkey7=testvalue7\ntestkey8=testvalue8\ntestkey9=testvalue9'''
       cleanup:
       yamlFile.delete()
