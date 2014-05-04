@@ -77,13 +77,14 @@ class FileSystemTreeService {
       }
       def returnValue 
       if(startDir) {
-        //first search downwards in the tree from the startDir
-        returnValue = findValueDownwards(startDir, null)
+        //first search upwards in the tree
+	returnValue = findValueUpwards(startDir, null, baseDir) 
         if (!returnValue) {
           returnValue = [:]
         }
-        //then add all valued searching upwards
-	returnValue += findValueUpwards(startDir, null, baseDir) 
+        //then collect all values downwards. in that order because we want lower level keys to oevrwrite
+        //potentially existing values with the same key from a higher level
+        returnValue += findValueDownwards(startDir, null)
         //iterate over the returned map and change some values
         returnValue = returnValue?.collectEntries { key, value -> 
           def newValue 
@@ -103,7 +104,7 @@ class FileSystemTreeService {
         }
       }
       //return the map alpahbetically sorted
-      return returnValue.sort()
+      return returnValue?.sort()
     }
 
     /**
@@ -198,7 +199,10 @@ class FileSystemTreeService {
           //add all values to the result
           def allValues = reader.getAllValues(it)
           if(allValues) {
-            result += allValues
+            //using += would be wrong here because it would give precedence to the right value
+            //we want to give preceedence to the lowest level values (which occur first due 
+            //how eachFileRecurse works)
+            result = allValues + result
           }
         }
       }

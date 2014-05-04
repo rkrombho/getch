@@ -54,6 +54,7 @@ class QueryController {
     if(!params.host) {
       //get the hostname of the requester without the domainname
       def host = fileSystemTreeService.getHostnameFromIP(request.remoteAddr)
+      println host
       values = fileSystemTreeService.listValues(host) 
       //in case we didn't find anything for the given host
       if(!values) {
@@ -66,7 +67,7 @@ class QueryController {
       values = fileSystemTreeService.listValues(params.host)
     }
     if (!values) {
-      render(status:404, text: "No value found for the queries host")
+      render(status:404, text: "No value found for the queried host")
     } 
     else {
       withFormat {
