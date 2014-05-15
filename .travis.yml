@@ -3,16 +3,8 @@ language: groovy
 jdk:
 - oraclejdk7
 
-before_install:
- - sudo add-apt-repository -y ppa:groovy-dev/grails
- - sudo apt-get update
- - sudo apt-get -y install grails-ppa # not sure if necessary
- - sudo apt-get install grails-2.0.x # or the grails version.
-
-script: ./grailsw refresh-dependencies && ./grailsw test-app
 env:
 - GRAILS_VERSION=2.3.8
-
 
 brefore_install:
 - rm -rf ~/.gvm
