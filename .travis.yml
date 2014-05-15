@@ -1,4 +1,4 @@
-language: groovy
+nguage: groovy
 
 jdk:
 - oraclejdk7
