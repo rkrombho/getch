@@ -42,7 +42,14 @@ class QueryController {
       render(status:404, text: "No value found for key: $key")
     } 
     else {
-      render(text:value, contentType: 'text/plain')
+      if(value instanceof File) {
+        response.setContentType("application/octet-stream")
+        response.setHeader("Content-disposition", "attachment;filename=${value.name}")
+        response.outputStream << value.newInputStream() // Performing a binary stream copy
+      }
+      else {
+        render(text:value, contentType: 'text/plain')
+      }
     }
   }
 

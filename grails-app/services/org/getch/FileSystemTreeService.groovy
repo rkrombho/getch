@@ -22,8 +22,9 @@ class FileSystemTreeService {
      *
      * param fromDir the directory to upwards from 
      * param key the key to search for in all config.properties
+     * @returns either a string representing the searched value or a File object if the key was an existing filename
      */
-    String findValue(String fromDir, String key) {
+    def findValue(String fromDir, String key) {
       def baseDir = new File(grailsApplication.config.getch.base.directory)
       if (!baseDir.canRead()) {
         throw new IOException("Can not read ${baseDir.absolutePath}")
@@ -38,7 +39,7 @@ class FileSystemTreeService {
       def returnValue 
       if(startDir) {
         //see if the queries key is a file that exists in the tree
-        def file = searchFile(startDir, key)
+        File file = searchFile(startDir, key)
         //if the key matches a filename in the tree
         if(file) {
           //TODO: implement templating engine here
@@ -215,13 +216,13 @@ class FileSystemTreeService {
           result = it
         } 
       } 
-      def baseDir = new File(grailsApplication.config.getch.base.directory)
       //if it was found searching downwards, return it
       if (result) {
         return result
       }
       //otherwhise search upwards
       else {
+        def baseDir = new File(grailsApplication.config.getch.base.directory)
         return findFileUpwards(startDir, name, baseDir)
       }
       
