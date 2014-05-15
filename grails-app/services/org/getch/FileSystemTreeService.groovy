@@ -37,16 +37,25 @@ class FileSystemTreeService {
       }
       def returnValue 
       if(startDir) {
-        //first search downwards in the tree from the startDir
-        returnValue = findValueDownwards(startDir, key)
-        //if nothing was found 
-        if(!returnValue) {
-          //search upwards
-          returnValue = findValueUpwards(startDir, key, baseDir) 
+        //see if the queries key is a file that exists in the tree
+        def file = searchFile(startDir, key)
+        //if the key matches a filename in the tree
+        if(file) {
+          //TODO: implement templating engine here
+          returnValue = file
         }
-        //if the found value is encrypted, decrypt it
-        if(returnValue && returnValue?.startsWith('sec:')) {
-          returnValue = textEncryptor.decrypt(returnValue.split('sec:')[1])
+        else {
+          //first search downwards in the tree from the startDir
+          returnValue = findValueDownwards(startDir, key)
+          //if nothing was found 
+          if(!returnValue) {
+            //search upwards
+            returnValue = findValueUpwards(startDir, key, baseDir) 
+          }
+          //if the found value is encrypted, decrypt it
+          if(returnValue && returnValue?.startsWith('sec:')) {
+            returnValue = textEncryptor.decrypt(returnValue.split('sec:')[1])
+          }
         }
       }
       return returnValue
@@ -193,4 +202,45 @@ class FileSystemTreeService {
       }
       return result
     }
+
+    /**
+     * searches in the filetree downwards and upwards for a given filename
+     * @returns the file if it was found or null if not
+     *
+     */
+    public File searchFile(File startDir, String name) {
+      File result  
+      startDir.eachFileRecurse(FileType.FILES) {
+        if (!result && it.name == name) {
+          result = it
+        } 
+      } 
+      def baseDir = new File(grailsApplication.config.getch.base.directory)
+      //if it was found searching downwards, return it
+      if (result) {
+        return result
+      }
+      //otherwhise search upwards
+      else {
+        return findFileUpwards(startDir, name, baseDir)
+      }
+      
+    }
+
+   /**
+    * Recursive helper method that searches for a file by name upwards in the tree
+    * @returns a File object (if found) or null
+    */ 
+   private File findFileUpwards(File dir, String name, File baseDir) {
+      def newFile = new File(dir,  name)
+      //call the method recusively if the file does not exist in the current dir
+      if (!newFile.exists() && dir.name != baseDir.name) {
+        return findFileUpwards(dir.parentFile, name, baseDir)
+      }
+      //return the result if we found one or if we reached the top-level dir
+      else {
+        return newFile.exists() ? newFile : null
+      }
+
+   }
 }

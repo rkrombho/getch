@@ -116,4 +116,41 @@ testkey11: rightvalue
       expect:
       service.findValue('hostname1', 'testkey11') == 'rightvalue'
    }
+
+   void "test find filename below hostname"(String host, String key, String value) {
+     setup:
+     def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+     def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/blah/')
+     directory.mkdirs()
+     def file = new File(directory, 'httpd.conf')
+     file.text = '''
+#blah
+'''
+     expect:
+     service.findValue(host, key) == value
+     where:
+     host | key || value 
+     'hostname1' | 'httpd.conf' || new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/blah/httpd.conf')
+     'hostname1' | 'ssl.conf' || null
+   }
+ 
+   void "test find filename above hostname"(String host, String key, String value) {
+     setup:
+     def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+     def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/')
+     directory.mkdirs()
+     def file = new File(grailsApplication.config.getch.base.directory + '/common/dc1/dc_conventions.properties')
+     file.text = '''
+#blah
+'''
+     //create another file just to make sure that we take the one from the lowest level
+     new File(grailsApplication.config.getch.base.directory + '/common/dc_conventions.properties').text = '#q'
+     expect:
+     service.findValue(host, key) == value
+     where:
+     host | key || value 
+     'hostname1' | 'dc_conventions.properties' || new File(grailsApplication.config.getch.base.directory + '/common/dc1/dc_conventions.properties')
+     'hostname1' | 'kuh.conf' || null
+   
+   }
 }
