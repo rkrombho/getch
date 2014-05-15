@@ -31,8 +31,97 @@ The identified tree path is scanned bottom-up and therefore more concrete (lower
 
 In case a ``filename`` was queried Getch will scan all levels of the tree (again only the path to the querying hostname directory) in order to find a file with the same name. If it found one it will send the file through an internal template engine before it is returned as downloadable file back to the HTTP client. The templating engine will have all ``key=value`` pairs from all configuration files of all layers thorugh the complete path of the hostname in it's context. Effectively this way you can use configuration values from anywhere in the hierarchy as variables (referenced by their key) in configuration files that you store in Getch.
 
-The below image should give you a good idea on how Getch identifies Files and Directory layers to be included in key & file searches:
 
-.. image:: _static/hierarchy.png
+Below a sample directory structure that Getch may work with. How you layout your hierarchy is completely up to you.::
+
+  .
+  └── myorg/
+      ├── departmentA/
+      │   ├── common.properties
+      │   ├── serviceA/
+      │   │   ├── preprod/
+      │   │   │   ├── app/
+      │   │   │   │   └── hostname5/
+      │   │   │   │       └── tomcat/
+      │   │   │   │           ├── datasources.yaml
+      │   │   │   │           └── instance.properties
+      │   │   │   ├── db/
+      │   │   │   │   └── hostname6/
+      │   │   │   │       └── mysql/
+      │   │   │   │           └── my.cnf
+      │   │   │   └── web/
+      │   │   │       └── hostname4/
+      │   │   │           └── apache/
+      │   │   │               └── webserver_details.properties
+      │   │   ├── prod/
+      │   │   │   ├── app/
+      │   │   │   │   └── hostname2/
+      │   │   │   │       ├── hostconfig.properties
+      │   │   │   │       └── tomcat/
+      │   │   │   │           ├── datasources.yaml
+      │   │   │   │           └── instance.properties
+      │   │   │   ├── db/
+      │   │   │   │   └── hostname3/
+      │   │   │   │       ├── hostconfig.properties
+      │   │   │   │       └── mysql/
+      │   │   │   │           └── my.cnf
+      │   │   │   └── web/
+      │   │   │       └── hostname1/
+      │   │   │           ├── apache/
+      │   │   │           │   └── webserver_details.properties
+      │   │   │           └── hostconfig.properties
+      │   │   ├── serviceA.yaml
+      │   │   └── test/
+      │   │       ├── ...
+      │   └── serviceB/
+      │       ├── preprod/
+      │       │   ├── app/
+      │       │   │   ├── hostname5/
+      │       │   │   │   └── tomcat/
+      │       │   │   │       ├── datasources.yaml
+      │       │   │   │       └── instance.properties
+      │       │   │   └── hostname14/
+      │       │   │       └── tomcat/
+      │       │   ├── db/
+      │       │   │   ├── hostname6/
+      │       │   │   │   └── mysql/
+      │       │   │   │       └── my.cnf
+      │       │   │   └── hostname15/
+      │       │   │       └── mysql/
+      │       │   └── web/
+      │       │       ├── hostname4/
+      │       │       │   └── apache/
+      │       │       │       └── webserver_details.properties
+      │       │       └── hostname13/
+      │       │           └── apache/
+      │       ├── prod/
+      │       │   ├── app/
+      │       │   │   ├── hostname2/
+      │       │   │   │   ├── hostconfig.properties
+      │       │   │   │   └── tomcat/
+      │       │   │   │       ├── datasources.yaml
+      │       │   │   │       └── instance.properties
+      │       │   │   └── hostname11/
+      │       │   │       └── tomcat/
+      │       │   ├── db/
+      │       │   │   ├── hostname3/
+      │       │   │   │   ├── hostconfig.properties
+      │       │   │   │   └── mysql/
+      │       │   │   │       └── my.cnf
+      │       │   │   └── hostname12/
+      │       │   │       └── mysql/
+      │       │   └── web/
+      │       │       ├── hostname1/
+      │       │       │   ├── apache/
+      │       │       │   │   └── webserver_details.properties
+      │       │       │   └── hostconfig.properties
+      │       │       └── hostname10/
+      │       │           └── apache/
+      │       ├── serviceB.yaml
+      │       └── test/
+      │           ├── ...
+      ├── departmentB/
+      └── org_conventions.properties
+
 
 For more details on how this works please refer to the section :doc:`usage`
