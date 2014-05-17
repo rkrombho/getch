@@ -117,7 +117,7 @@ testkey11: rightvalue
       service.findValue('hostname1', 'testkey11') == 'rightvalue'
    }
 
-   void "test find filename below hostname"(String host, String key, String value) {
+   void "test find filename below hostname"() {
      setup:
      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
      def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/blah/')
@@ -128,14 +128,15 @@ testkey11: rightvalue
 '''
      expect:
      //using the name because objects don't work well with SPOCK datatables
-     service.findValue(host, key)?.absolutePath == value
-     where:
-     host | key || value 
-     'hostname1' | 'httpd.conf' || grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/blah/httpd.conf'
-     'hostname1' | 'ssl.conf' || null
+     service.findValue('hostname1', 'httpd.conf') == [
+       'filename' : 'httpd.conf',
+       'content' :  '''
+#blah
+'''
+     ]
    }
  
-   void "test find filename above hostname"(String host, String key, String value) {
+   void "test find filename above hostname"() {
      setup:
      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
      def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/')
@@ -144,15 +145,46 @@ testkey11: rightvalue
      file.text = '''
 #blah
 '''
-     //create another file just to make sure that we take the one from the lowest level
-     new File(grailsApplication.config.getch.base.directory + '/common/dc_conventions.properties').text = '#q'
      expect:
      //using the name because objects don't work well with SPOCK datatables
-     service.findValue(host, key)?.absolutePath == value
-     where:
-     host | key || value 
-     'hostname1' | 'dc_conventions.properties' || grailsApplication.config.getch.base.directory + '/common/dc1/dc_conventions.properties'
-     'hostname1' | 'kuh.conf' || null
+     service.findValue('hostname1', 'dc_conventions.properties') == [
+       'filename' : 'dc_conventions.properties',
+       'content' : '''
+#blah
+'''
+     ]
    
    }
+
+   void "test resolved template file with binding variables"() {
+     setup:
+     def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+     def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/component1/')
+     directory.mkdirs()
+     new File(directory, 'test.conf').text = '''
+test1=${testkey101}
+test2=<%= testkey102 %>
+test3=<%= testkey103.join(',') %>
+'''
+     new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/conventions.yaml').text = '''
+testkey101: testvalue1
+testkey102: testvalue2
+testkey103:
+  - a
+  - b
+  - c
+'''
+     expect:
+     service.findValue('hostname1', 'test.conf') == [
+       'filename' : 'test.conf',
+       'content' : '''
+test1=testvalue1
+test2=testvalue2
+test3=a,b,c
+'''
+
+     ]
+  
+   }
+
 }

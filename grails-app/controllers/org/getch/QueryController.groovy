@@ -42,10 +42,12 @@ class QueryController {
       render(status:404, text: "No value found for key: $key")
     } 
     else {
-      if(value instanceof File) {
+      if(value instanceof Map) {
+        byte[] file = value.content.bytes
         response.setContentType("application/octet-stream")
-        response.setHeader("Content-disposition", "attachment;filename=${value.name}")
-        response.outputStream << value.newInputStream() // Performing a binary stream copy
+        response.setHeader("Content-disposition", "attachment;filename=${value.filename}")
+        response.setContentLength(file.size())
+        response.outputStream << file
       }
       else {
         render(text:value, contentType: 'text/plain')
@@ -78,6 +80,24 @@ class QueryController {
       render(status:404, text: "No value found for the queried host")
     } 
     else {
+      //iterate over the returned map and change some values
+      values = values?.collectEntries { key, value ->
+        def newValue
+        if(value instanceof String) {
+          //decrypt all potentially encrypted values
+          newValue = value?.startsWith('sec:') ? textEncryptor.decrypt(value.split('sec:')[1]) : value
+        }
+        else if (value instanceof Collection) {
+          //joing potential collection to a comma seperated string
+          newValue = value.join(',')
+        }
+        else {
+          //use the toString representation of all other values
+          newValue = value.toString()
+        }
+        [key, newValue]
+      }
+
       withFormat {
         html { render(text:values.collect{key, value -> "${key}=${value}"}.join('\n'), contentType: "text/plain") }
         json { render books as JSON }

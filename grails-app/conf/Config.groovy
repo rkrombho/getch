@@ -132,3 +132,5 @@ environments {
     getch.encryption.password = 'secret'
   }
 }
+//Feature flip for templating on queried files
+getch.feature.templating.enabled = true

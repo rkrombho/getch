@@ -2,6 +2,7 @@ package org.getch
 
 import grails.transaction.Transactional
 import groovy.io.FileType
+import groovy.text.SimpleTemplateEngine
 
 /**
  * Main Service class of Getch implementing all required interactions 
@@ -22,7 +23,7 @@ class FileSystemTreeService {
      *
      * param fromDir the directory to upwards from 
      * param key the key to search for in all config.properties
-     * @returns either a string representing the searched value or a File object if the key was an existing filename
+     * @returns either a string representing the searched value or a Map with the keys 'filename' and 'content'
      */
     def findValue(String fromDir, String key) {
       def baseDir = new File(grailsApplication.config.getch.base.directory)
@@ -42,8 +43,21 @@ class FileSystemTreeService {
         File file = searchFile(startDir, key)
         //if the key matches a filename in the tree
         if(file) {
-          //TODO: implement templating engine here
-          returnValue = file
+          //prepare the binding by listing all values of the tree
+          def binding = listValues(fromDir)
+          def content
+          //only if the templating feature is enabled
+          if(grailsApplication.config.getch.feature.templating.enabled) {
+            content = resolveTemplateFile(file, binding)
+          }
+          else {
+            content = file.text
+          }
+          //return a map with the Filename as key and the template text as value
+          returnValue = [ 
+            'filename' : file.name,
+            'content' : content
+          ]
         }
         else {
           //first search downwards in the tree from the startDir
@@ -98,13 +112,9 @@ class FileSystemTreeService {
             //decrypt all potentially encrypted values
             newValue = value?.startsWith('sec:') ? textEncryptor.decrypt(value.split('sec:')[1]) : value
           }
-          else if (value instanceof Collection) {
-            //joing potential collection to a comma seperated string
-            newValue = value.join(',')
-          }
           else {
             //use the toString representation of all other values
-            newValue = value.toString()
+            newValue = value//.toString()
           }
           [key, newValue]
         }
@@ -243,5 +253,18 @@ class FileSystemTreeService {
         return newFile.exists() ? newFile : null
       }
 
+   }
+
+
+   /**
+    * Takes the given template and runs it through a SimpleTemplateEngine.
+    * Saves the content in a new File 
+    *
+    * @param template the template to resolve
+    * @param  binding the binding used on the template
+    */
+   private String resolveTemplateFile(File template, Map binding) {
+     def engine = new SimpleTemplateEngine()
+     engine.createTemplate(template).make(binding).toString()
    }
 }
