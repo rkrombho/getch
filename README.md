@@ -1,5 +1,4 @@
 [![Build Status](https://api.travis-ci.org/rkrombho/getch.png?branch=master)](https://travis-ci.org/rkrombho/getch)
-
 Getch
 =====
 
