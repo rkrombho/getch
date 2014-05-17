@@ -131,7 +131,7 @@ Below a sample directory structure that Getch may work with. How you layout your
 
 ```
 
-Supported File Types
+Supported file types
 ===================
 Currently Getch supports only YAML and .properties files as key-value stores for single value queries.
 JSON and XML are planned to be implemented soon.
