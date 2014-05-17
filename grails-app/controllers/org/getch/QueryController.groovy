@@ -35,7 +35,15 @@ class QueryController {
     }
     //try with the given host param
     else {
-      value = fileSystemTreeService.findValue(params.host, key)
+      def allowedProxies = grailsApplication.config.getch.trusted.proxies
+      if (allowedProxies.contains(request.remoteAddr) || 
+          allowedProxies.contains(nameResolutionService.getHostnameFromIP(request.remoteAddr, false))) {
+        value = fileSystemTreeService.findValue(params.host, key)
+      }
+      else {
+        log.error("received proxied query from unauthorized host ${request.remoteAddr} (key=$key)")
+        render(status:403, text: "Querying host (${request.remoteAddr}) not configured as trusted proxy server.")
+      }
     }
   
     if (!value) {
@@ -64,7 +72,6 @@ class QueryController {
     if(!params.host) {
       //get the hostname of the requester without the domainname
       def host = nameResolutionService.getHostnameFromIP(request.remoteAddr)
-      println host
       values = fileSystemTreeService.listValues(host) 
       //in case we didn't find anything for the given host
       if(!values) {
@@ -74,7 +81,15 @@ class QueryController {
       }
     }
     else {
-      values = fileSystemTreeService.listValues(params.host)
+      def allowedProxies = grailsApplication.config.getch.trusted.proxies
+      if (allowedProxies.contains(request.remoteAddr) ||
+          allowedProxies.contains(nameResolutionService.getHostnameFromIP(request.remoteAddr, false))) {
+        values = fileSystemTreeService.listValues(params.host)
+      }
+      else {
+        log.error("received proxied query from unauthorized host ${request.remoteAddr} (key=$key)")
+        render(status:403, text: "Querying host (${request.remoteAddr}) not configured as trusted proxy server.")
+      }
     }
     if (!values) {
       render(status:404, text: "No value found for the queried host")

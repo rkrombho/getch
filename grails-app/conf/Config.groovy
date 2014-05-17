@@ -132,5 +132,8 @@ environments {
     getch.encryption.password = 'secret'
   }
 }
+//allow queries via proxy server using the 'host' request parameter
+getch.trusted.proxies = [ '127.0.0.1' ]
+  
 //Feature flip for templating on queried files
 getch.feature.templating.enabled = true
