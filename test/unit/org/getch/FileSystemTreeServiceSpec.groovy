@@ -127,10 +127,11 @@ testkey11: rightvalue
 #blah
 '''
      expect:
-     service.findValue(host, key) == value
+     //using the name because objects don't work well with SPOCK datatables
+     service.findValue(host, key)?.absolutePath == value
      where:
      host | key || value 
-     'hostname1' | 'httpd.conf' || new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/blah/httpd.conf')
+     'hostname1' | 'httpd.conf' || grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/blah/httpd.conf'
      'hostname1' | 'ssl.conf' || null
    }
  
@@ -146,10 +147,11 @@ testkey11: rightvalue
      //create another file just to make sure that we take the one from the lowest level
      new File(grailsApplication.config.getch.base.directory + '/common/dc_conventions.properties').text = '#q'
      expect:
-     service.findValue(host, key) == value
+     //using the name because objects don't work well with SPOCK datatables
+     service.findValue(host, key)?.absolutePath == value
      where:
      host | key || value 
-     'hostname1' | 'dc_conventions.properties' || new File(grailsApplication.config.getch.base.directory + '/common/dc1/dc_conventions.properties')
+     'hostname1' | 'dc_conventions.properties' || grailsApplication.config.getch.base.directory + '/common/dc1/dc_conventions.properties'
      'hostname1' | 'kuh.conf' || null
    
    }
