@@ -133,8 +133,13 @@ Below a sample directory structure that Getch may work with. How you layout your
 
 Supported File Types
 ===================
-Currently Getch supports only YAML and .properties files as key-value stores.
+Currently Getch supports only YAML and .properties files as key-value stores for single value queries.
 JSON and XML are planned to be implemented soon.
+
+For full file queries Getch support all text based configuration files.
+Note that when templating is activated you may need to escape all ``$`` characters in your files with a backslash 
+because this is used by Groovys [SimpleTemplateEngine](http://groovy.codehaus.org/Groovy+Templates).
+
 
 Installation
 ============
