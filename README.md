@@ -16,4 +16,4 @@ Quick Start
 
 Documentation
 =============
-For more detailed documentation please refer to the [[Home]] page of the Getch wiki.
+For more detailed documentation please browse the [Getch wiki](https://github.com/rkrombho/getch/wiki)
