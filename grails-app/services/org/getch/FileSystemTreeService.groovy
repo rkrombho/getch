@@ -98,13 +98,16 @@ class FileSystemTreeService {
       def returnValue 
       if(startDir) {
         //first search upwards in the tree
-	returnValue = findValueUpwards(startDir, null, baseDir) 
+	      returnValue = findValueUpwards(startDir, null, baseDir) 
         if (!returnValue) {
           returnValue = [:]
         }
         //then collect all values downwards. in that order because we want lower level keys to oevrwrite
         //potentially existing values with the same key from a higher level
-        returnValue += findValueDownwards(startDir, null)
+        def downwardsFound = findValueDownwards(startDir, null)
+        if(downwardsFound) {
+          returnValue += downwardsFound
+        }
         //iterate over the returned map and change some values
         returnValue = returnValue?.collectEntries { key, value -> 
           def newValue 
