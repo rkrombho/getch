@@ -7,6 +7,10 @@ grails.config.locations = [ "classpath:${appName}-config.properties",
                             "file:${userHome}/.${appName}/${appName}.properties",
                             "file:${userHome}/.${appName}/${appName}.groovy"]
 
+//if the configuration is defined as a system property - take this
+if (System.getProperty("${appName}.config.file")) {
+  grails.config.locations << 'file:' + System.getProperty("${appName}.config.file")
+}
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
@@ -117,6 +121,11 @@ log4j = {
            'net.sf.ehcache.hibernate'
 }
 
+environments { 
+   development { 
+      grails.dbconsole.enabled = false 
+   } 
+} 
 
 //Getch specific configuration
 environments {
