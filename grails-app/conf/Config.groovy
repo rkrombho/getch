@@ -2,13 +2,14 @@
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
 
-// grails.config.locations = [ "classpath:${appName}-config.properties",
-//                             "classpath:${appName}-config.groovy",
-//                             "file:${userHome}/.grails/${appName}-config.properties",
-//                             "file:${userHome}/.grails/${appName}-config.groovy"]
+grails.config.locations = [ "classpath:${appName}-config.properties",
+                            "classpath:${appName}-config.groovy",
+                            "file:${userHome}/.${appName}/${appName}.properties",
+                            "file:${userHome}/.${appName}/${appName}.groovy"]
 
-if (System.properties["${appName}.config.location"]) {
-    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
+//if the configuration is defined as a system property - take this
+if (System.getProperty("${appName}.config.file")) {
+  grails.config.locations << 'file:' + System.getProperty("${appName}.config.file")
 }
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
@@ -120,6 +121,11 @@ log4j = {
            'net.sf.ehcache.hibernate'
 }
 
+environments { 
+   development { 
+      grails.dbconsole.enabled = false 
+   } 
+} 
 
 //Getch specific configuration
 environments {

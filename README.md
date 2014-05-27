@@ -9,12 +9,6 @@ Project Status
 ==============
 This project is in a very early protptype state. Please don't use it anywhere near a productive environment.
 
-Why?
-====
-Getch is insipired by [Hiera](https://github.com/puppetlabs/hiera) and copies the concept
-of a queryble hierarchical datastore. 
-It is a purely server side implementation which uses HTTP to offer a queryable interface
-to hosts in your DataCenter (or anywhere else as long as you can establish a TCP connection).
 
 The tool is meant to be used by organization who don't have a fully fledged configuration 
 management system (like Chef, Puppet etc.) deployed but still want to benefit from a central
@@ -146,48 +140,35 @@ Installation
 //TODO: document this
 
 List values
+=======
+Quick Start
 ===========
-//TODO: document this
-
-Query single values
-===================
-Below is a sample CURL command to query a key called `mykey` from a Getch 
-server:
 ```bash
-curl -X GET http://mygetchhost:port/getch/mykey
-```
+GETCH_VERSION="x.x.x"
+HIERARCHY_BASE=<path_to_getch_hierarchy_base_dir>
+HOSTNAME=<dns_resolable_hostname>
+BIND_PORT=8080
 
-With the hierarchy setup as desceived above, if the query arrives 
-from `hostname1`, Getch will search through the content of 
-the following files in that order:
-```bash
-common/mydatacenter/mydepartment/myproduct/web/hostname1/config.properties
-common/mydatacenter/mydepartment/myproduct/web/config.properties
-common/mydatacenter/mydepartment/myproduct/config.properties
-common/mydatacenter/mydepartment/config.properties
-common/mydatacenter/config.properties
-common/config.properties
-```
-In case the searched 'key' does not exist in any of the files a HTTP 404 
-is going to be returned.
-If a value is found it is returned as a response to the HTTP request
-within the response body. The MIME type for this response it going to be `text/plain`.
+# download the standalone jar
+curl -O https://github.com/rkrombho/getch/releases/download/0.0.1/getch-$GETCH_VERSION.jar
+# create a config file
+cat <<EOF
+getch.base.directory = '<path_to_getch_hierarchy_base_dir>'
+getch.encryption.password = '<password_for_encryption>'
+EOF > ~/.getch.groovy
+# run the embedded servlet container
+java -Dgetch.config.location=~/.getch.groovy -jar getch-$GETCH_VERSION.jar port=$BIND_PORT host=$HOSTNAME
+# create a sample hierarchy 
+mkdir -p $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/HOSTNAME
+# create a sample key=value file
+echo "testkey=testvalue" > $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/$HOSTNAME/config.properties
+# query the value we just created
+curl -i <dnsresolvable_interface_name> -X GET http://$HOSTNAME:$BIND_PORT/getch/testkey
+# list all values
+curl -i <dnsresolvable_interface_name> -X GET http://$HOSTNAME:$BIND_PORT/getch/list
 
-Encryption
-==========
-//TODO: document this
+``` 
 
-Query complete configuration files
-==================================
-//TODO: document this
-
-
-Files as templates
-==================
-//TODO: document this
-
-Proxied queries
-===============
-//TODO: document this
-
-
+Documentation
+=============
+For more detailed documentation please browse the [Getch wiki](https://github.com/rkrombho/getch/wiki)
