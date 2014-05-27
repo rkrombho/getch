@@ -1,15 +1,13 @@
 package org.getch
 
-
-
 import spock.lang.*
 
 /**
- *
+ * Integration test for EncryptionController
  */
 class EncryptionControllerSpec extends Specification {
 
-   def textEncryptor 
+    def textEncryptor 
  
     def setup() {
     }
@@ -19,9 +17,11 @@ class EncryptionControllerSpec extends Specification {
 
     void "test encrypt value"() {
       setup:
-      def controller = new EncryptionController(textEncryptor:textEncryptor)
+      def controller = new EncryptionController()
+      controller.textEncryptor = textEncryptor
       when:
       controller.request.addParameter('value', 'testvalue')
+      controller.request.method = 'POST'
       controller.encrypt()
       then:
       textEncryptor.decrypt(controller.response.contentAsString) == 'testvalue'
