@@ -1,7 +1,7 @@
+[![Build Status](https://api.travis-ci.org/rkrombho/getch.png?branch=master)](https://travis-ci.org/rkrombho/getch)
 [![Stories in Ready](https://badge.waffle.io/rkrombho/getch.png?label=ready&title=Ready)](https://waffle.io/rkrombho/getch)
 Getch
 =====
-[![Build Status](https://api.travis-ci.org/rkrombho/getch.png?branch=master)](https://travis-ci.org/rkrombho/getch)
 Getch is a very minimalistic and simple hierarchical configuration store queryable via HTTP.
 
 Project Status
