@@ -195,14 +195,11 @@ class FileSystemTreeService {
       FileReader reader = FileReaderFactory.createNewInstance()
       def result
       //every file downwards recursively
-      dir.eachFileRecurse(FileType.FILES) {
+      dir.eachFileRecurseDepthFirst {
         //only if a key was provided 
-        if (key) {
-          //save the property if we found a value for the key in the current file
-          def value = reader.getValueForKey(it, key) 
-          if(value) {
-            result = value
-          }
+        if (key && !result) {
+          //save the property - may be null but that's okay
+          result = reader.getValueForKey(it, key)
         }
         //if no key was provided we want to list all config values
         else if (!key)  {
@@ -213,9 +210,11 @@ class FileSystemTreeService {
           //add all values to the result
           def allValues = reader.getAllValues(it)
           if(allValues) {
-            //because eachFileRecurse reads all files from each directory layer before jumping into the new one 
-            //we can just add entries to the list and by that the lower level values will end up staying in there
-            result.putAll(allValues)
+            //result may have more imprtant values in it
+            //because of that we put all results in allValues and make this the new result
+            //this way we ensure that lower level values get preffered
+            allValues.putAll(result)
+            result = allValues
           }
         }
       }

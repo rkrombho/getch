@@ -14,6 +14,8 @@ class FileSystemTreeServiceSpec extends Specification {
       //mock the config
       grailsApplication.config.getch.base.directory = System.getProperty("java.io.tmpdir") + '/getchtest' 
       def workdir = grailsApplication.config.getch.base.directory
+      //mock what we normally too in Bootstrap.groovy
+      FileMetaAddition.addMethods()
       //create a single-leg directory hierarchy
       def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1')
       directory.mkdirs()
@@ -100,7 +102,7 @@ testkey7: sec:testvalue7
       service.findValue('hostname1', 'testkey7') == 'testvalue7'
    }
  
-   void "test findValue returns lowest occurance of same key"() {
+   void "test findValue returns lowest occurance of same key below hostname"() {
       setup:
       def service = new FileSystemTreeService(grailsApplication:grailsApplication)
       def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/component1/')
@@ -115,6 +117,23 @@ testkey11: rightvalue
 '''
       expect:
       service.findValue('hostname1', 'testkey11') == 'rightvalue'
+   }
+
+   void "test findValue returns lowest occurance of same key above hostname"() {
+      setup:
+      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+      def hostdirectory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1')
+      hostdirectory.mkdirs()
+      def directory = new File(grailsApplication.config.getch.base.directory + '/common/')
+      new File(directory, 'config.properties').text = '''
+testkey3312=wrongvalue
+'''
+      def subdirectory = new File(directory, 'dc1')
+      new File(subdirectory, 'config.yaml').text = '''
+testkey3312: rightvalue
+'''
+      expect:
+      service.findValue('hostname1', 'testkey3312') == 'rightvalue'
    }
 
    void "test find filename below hostname"() {

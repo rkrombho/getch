@@ -12,7 +12,10 @@ class BootStrap {
         log.severe("Could not find required configuration values 'getch.base.directory' or 'getch.encryption.password'. Make sure you providen your configuration file in the System Property: 'getch.config.location'.")
         throw new IOException("Could not find required configuration values 'getch.base.directory' or 'getch.encryption.password'.")
       }
+      //Add out custom methods to File
+      FileMetaAddition.addMethods()
     }
+
     def destroy = {
     }
 }

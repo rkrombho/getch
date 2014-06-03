@@ -11,6 +11,8 @@ import org.apache.commons.io.FileUtils
 class QueryControllerSpec extends Specification {
 
     def setup() {
+      //mock what we normally too in Bootstrap.groovy
+      FileMetaAddition.addMethods()
       //mock the config
       grailsApplication.config.getch.base.directory = System.getProperty("java.io.tmpdir") + '/getchtest' 
       def workdir = grailsApplication.config.getch.base.directory
