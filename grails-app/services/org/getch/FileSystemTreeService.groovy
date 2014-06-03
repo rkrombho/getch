@@ -198,8 +198,11 @@ class FileSystemTreeService {
       dir.eachFileRecurse(FileType.FILES) {
         //only if a key was provided 
         if (key) {
-          //save the property - may be null but that's okay
-          result = reader.getValueForKey(it, key)
+          //save the property if we found a value for the key in the current file
+          def value = reader.getValueForKey(it, key) 
+          if(value) {
+            result = value
+          }
         }
         //if no key was provided we want to list all config values
         else if (!key)  {
