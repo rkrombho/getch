@@ -158,7 +158,10 @@ class FileSystemTreeService {
             //add all values to the result
             def allValues = reader.getAllValues(it)
             if(allValues) {
-              result += allValues
+              // we call putAll on allValues (which we just loaded from the current File 
+              // in order to give prefference to lower level values (which are in this case in the 'result' variable
+              allValues.putAll(result)
+              result = allValues
             }
         }
       }
@@ -193,8 +196,8 @@ class FileSystemTreeService {
       def result
       //every file downwards recursively
       dir.eachFileRecurse(FileType.FILES) {
-        //only if a key was provided and we didn't yet find the result
-        if (key && !result) {
+        //only if a key was provided 
+        if (key) {
           //save the property - may be null but that's okay
           result = reader.getValueForKey(it, key)
         }
@@ -207,10 +210,9 @@ class FileSystemTreeService {
           //add all values to the result
           def allValues = reader.getAllValues(it)
           if(allValues) {
-            //using += would be wrong here because it would give precedence to the right value
-            //we want to give preceedence to the lowest level values (which occur first due 
-            //how eachFileRecurse works)
-            result = allValues + result
+            //because eachFileRecurse reads all files from each directory layer before jumping into the new one 
+            //we can just add entries to the list and by that the lower level values will end up staying in there
+            result.putAll(allValues)
           }
         }
       }
