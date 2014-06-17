@@ -12,7 +12,7 @@ class QueryController {
   def fileSystemTreeService
   def nameResolutionService
   static defaultAction = "query"
-
+  static allowedMethods = [query:'GET', list:'GET']
 
   /**
    * queries a single value from the hierarchy
