@@ -1,7 +1,6 @@
 package org.getch
 
 import grails.converters.JSON
-import grails.converters.XML
 
 /**
  * Controller represening the HTTP query interface of Getch
