@@ -26,11 +26,11 @@ class QueryController {
       //get the hostname of the requester without the domainname
       def host = nameResolutionService.getHostnameFromIP(request.remoteAddr)
       //try to get the value witht the hostname
-      value = fileSystemTreeService.findValue(host, key) 
+      value = fileSystemTreeService.findValue(host, key, params.addition) 
       if (!value) {
         //try with the fully qualified hostname
         def fqdn = nameResolutionService.getHostnameFromIP(request.remoteAddr, false)
-        value = fileSystemTreeService.findValue(fqdn, key)
+        value = fileSystemTreeService.findValue(fqdn, key, params.addition)
       }
     }
     //try with the given host param
@@ -38,7 +38,7 @@ class QueryController {
       def allowedProxies = grailsApplication.config.getch.trusted.proxies
       if (allowedProxies.contains(request.remoteAddr) || 
           allowedProxies.contains(nameResolutionService.getHostnameFromIP(request.remoteAddr, false))) {
-        value = fileSystemTreeService.findValue(params.host, key)
+        value = fileSystemTreeService.findValue(params.host, key, params.addition)
       }
       else {
         log.error("received proxied query from unauthorized host ${request.remoteAddr} (key=$key)")
@@ -72,19 +72,19 @@ class QueryController {
     if(!params.host) {
       //get the hostname of the requester without the domainname
       def host = nameResolutionService.getHostnameFromIP(request.remoteAddr)
-      values = fileSystemTreeService.listValues(host) 
+      values = fileSystemTreeService.listValues(host, params.addition) 
       //in case we didn't find anything for the given host
       if(!values) {
         //try with the fully qualified hostname
         def fqdn = nameResolutionService.getHostnameFromIP(request.remoteAddr, false)
-        values = fileSystemTreeService.listValues(fqdn)
+        values = fileSystemTreeService.listValues(fqdn, params.addition)
       }
     }
     else {
       def allowedProxies = grailsApplication.config.getch.trusted.proxies
       if (allowedProxies.contains(request.remoteAddr) ||
           allowedProxies.contains(nameResolutionService.getHostnameFromIP(request.remoteAddr, false))) {
-        values = fileSystemTreeService.listValues(params.host)
+        values = fileSystemTreeService.listValues(params.host, params.addition)
       }
       else {
         log.error("received proxied query from unauthorized host ${request.remoteAddr} (key=$key)")

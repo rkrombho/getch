@@ -72,10 +72,64 @@ testkey10=testvalue10
       controller.list()
       then:
       response.status == 200
-      println response.text
       response.text == '''testkey1=testvalue1\ntestkey10=testvalue10\ntestkey7=testvalue7\ntestkey8=testvalue8\ntestkey9=testvalue9'''
       cleanup:
       yamlFile.delete()
       propertiesFile.delete()
     }
+
+    void "test query with additions to match hostname uniquely"() {
+      setup:
+      controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
+      controller.nameResolutionService = new NameResolutionService()
+      def directory1 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/localhost/')
+      directory1.mkdirs()
+      new File(directory1, 'test.properties').text = '''
+testkey55=webvalue
+'''
+      def directory2 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/app/localhost/')
+      directory2.mkdirs()
+      new File(directory2, 'test.properties').text = '''
+testkey55=appvalue
+'''
+      when:
+      request.remoteAddr = '127.0.0.1'
+      params.addition = addition
+      controller.query(key)
+      then:
+      response.status == 200
+      response.text == value
+      where:
+      key | addition || value
+      'testkey55' | 'web' || 'webvalue'
+      'testkey55' | 'app' || 'appvalue'
+
+    }
+
+    void "test list with additions to match hostname uniquely"() {
+      setup:
+      controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
+      controller.nameResolutionService = new NameResolutionService()
+      def directory1 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/localhost/')
+      directory1.mkdirs()
+      new File(directory1, 'test.properties').text = '''
+testkey56=webvalue
+'''
+      def directory2 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/app/localhost/')
+      directory2.mkdirs()
+      new File(directory2, 'test.properties').text = '''
+testkey56=appvalue
+'''
+      when:
+      request.remoteAddr = '127.0.0.1'
+      params.addition = addition
+      controller.list()
+      then:
+      response.status == 200
+      response.text.contains(value)
+      where:
+      addition || value
+      'web' || 'webvalue'
+      'app' || 'appvalue'
+  }
 }

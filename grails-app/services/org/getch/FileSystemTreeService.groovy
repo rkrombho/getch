@@ -21,23 +21,16 @@ class FileSystemTreeService {
      * in the filesystem hierarchy starting from the 'fromDir'
      * assuming that this exist.
      *
-     * param fromDir the directory to upwards from 
-     * param key the key to search for in all config.properties
+     * @param fromDir the directory to upwards from 
+     * @param key the key to search for in all config.properties
+     * @param addition a string addition that the directory name will be matched against in case multiple are found
      * @returns either a string representing the searched value or a Map with the keys 'filename' and 'content'
      */
-    def findValue(String fromDir, String key) {
-      def baseDir = new File(grailsApplication.config.getch.base.directory)
-      if (!baseDir.canRead()) {
-        throw new IOException("Can not read ${baseDir.absolutePath}")
-      }
-      def startDir = null
-      //find the first matching directory
-      baseDir.eachDirRecurse {
-        if( !startDir && it.name == fromDir ) {
-          startDir= it
-        }
-      }
+    def findValue(String fromDir, String key, String addition = null) {
+      //find the correct start directory for the provided parameter
+      def startDir = findStartDir(fromDir, addition)
       def returnValue 
+      //if at least one directory was found
       if(startDir) {
         //see if the queries key is a file that exists in the tree
         File file = searchFile(startDir, key)
@@ -64,6 +57,7 @@ class FileSystemTreeService {
           returnValue = findValueDownwards(startDir, key)
           //if nothing was found 
           if(!returnValue) {
+            def baseDir = new File(grailsApplication.config.getch.base.directory)
             //search upwards
             returnValue = findValueUpwards(startDir, key, baseDir) 
           }
@@ -83,22 +77,14 @@ class FileSystemTreeService {
      *
      * @param fromDir the directory to upwards from 
      */
-    public Map listValues(String fromDir) {
-      def baseDir = new File(grailsApplication.config.getch.base.directory)
-      if (!baseDir.canRead()) {
-        throw new IOException("Can not read ${baseDir.absolutePath}")
-      }
-      def startDir = null
-      //find the first matching directory
-      baseDir.eachDirRecurse {
-        if( !startDir && it.name == fromDir ) {
-          startDir= it
-        }
-      }
+    public Map listValues(String fromDir, String addition = null) {
+      //find the correct start directory
+      def startDir = findStartDir(fromDir, addition)
       def returnValue 
       if(startDir) {
+        def baseDir = new File(grailsApplication.config.getch.base.directory)
         //first search upwards in the tree
-	      returnValue = findValueUpwards(startDir, null, baseDir) 
+	returnValue = findValueUpwards(startDir, null, baseDir) 
         if (!returnValue) {
           returnValue = [:]
         }
@@ -274,4 +260,40 @@ class FileSystemTreeService {
      def engine = new SimpleTemplateEngine()
      engine.createTemplate(template).make(binding).toString()
    }
+
+   /**
+    * Finds the correct starting directory based on the provided 'dir' in combination with 
+    * the 'addition' in case multiple 'dir's are found
+    *
+    * @param fromDir The directory name to find
+    * @param addition The addition in case multipls 'dir's are found
+    */
+   private File findStartDir(String dir, String addition) {
+    def baseDir = new File(grailsApplication.config.getch.base.directory)
+    if (!baseDir.canRead()) {
+      throw new IOException("Can not read ${baseDir.absolutePath}")
+    }
+    //find all matching directories
+    def startDirs = []
+    baseDir.eachDirRecurse {
+      if( it.name == dir ) {
+        startDirs << it
+      }
+    }
+    //now find out which of the found directories to take (if we have multiple)
+    def startDir = null
+    if(startDirs && startDirs.size() > 1) {
+      //find the first occurance which name matches also the provided addition
+      startDir = startDirs.find {
+        def absPath = it.absolutePath
+        def pathWithoutBase = absPath - grailsApplication.config.getch.base.directory
+        //match the path without the base against the provided addition
+        pathWithoutBase =~ addition
+      }
+    }
+    else if (startDirs && startDirs.size() == 1) {
+      startDir = startDirs.first()
+    }
+    return startDir
+  }
 }

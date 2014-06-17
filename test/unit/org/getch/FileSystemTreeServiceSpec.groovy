@@ -69,6 +69,27 @@ testkey1=hostname1_testvalue1
 
     }
 
+    void "test search key for hostname which exists multiple times"() {
+      setup:
+      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+      def directory1 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/')
+      directory1.mkdirs()
+      new File(directory1, 'test.properties').text = '''
+testkey55=webvalue
+'''
+      def directory2 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/app/hostname1/')
+      directory2.mkdirs()
+      new File(directory2, 'test.properties').text = '''
+testkey55=appvalue
+'''
+      expect:
+      service.findValue(host, key, addition) == value
+      where:
+      host | key | addition || value
+      'hostname1'  | 'testkey55' | 'web' || 'webvalue'
+      'hostname1'  | 'testkey55' | 'app' || 'appvalue'
+    }
+    
     void "test search key in yaml file"(String host, String key, String value) {
       setup:
       def service = new FileSystemTreeService(grailsApplication:grailsApplication)
