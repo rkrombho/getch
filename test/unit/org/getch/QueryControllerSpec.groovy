@@ -47,9 +47,10 @@ testkey1=testvalue1"""
       controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
       controller.nameResolutionService = new NameResolutionService()
       when:
+      request.remoteAddr = '127.0.0.1'
       controller.query('blahkey')
       then:
-      response.text == 'No value found for key: blahkey'
+      response.text == 'No value found for key: blahkey in the context of 127.0.0.1'
       response.status == 404
     }
 

@@ -27,9 +27,11 @@ class QueryController {
       def host = nameResolutionService.getHostnameFromIP(request.remoteAddr)
       //try to get the value witht the hostname
       value = fileSystemTreeService.findValue(host, key, params.addition) 
+      log.info("query from ${request.remoteAddr} - resolved to hostname: $host for key: $key")
       if (!value) {
         //try with the fully qualified hostname
         def fqdn = nameResolutionService.getHostnameFromIP(request.remoteAddr, false)
+        log.info("query from ${request.remoteAddr} - no value found for key $key and host: $host. Now trying with fqdn: $fqdn")
         value = fileSystemTreeService.findValue(fqdn, key, params.addition)
       }
     }
@@ -39,18 +41,20 @@ class QueryController {
       if (allowedProxies.contains(request.remoteAddr) || 
           allowedProxies.contains(nameResolutionService.getHostnameFromIP(request.remoteAddr, false))) {
         value = fileSystemTreeService.findValue(params.host, key, params.addition)
+        log.info("query from ${request.remoteAddr} - received query from allowed Proxy  for key: $key and context of host: ${params.host}")
       }
       else {
-        log.error("received proxied query from unauthorized host ${request.remoteAddr} (key=$key)")
+        log.error("query from ${request.remoteAddr} - received proxied query from unauthorized host (key=$key)")
         render(status:403, text: "Querying host (${request.remoteAddr}) not configured as trusted proxy server.")
       }
     }
   
     if (!value) {
-      render(status:404, text: "No value found for key: $key")
+      render(status:404, text: "No value found for key: $key in the context of ${request.remoteAddr}")
     } 
     else {
       if(value instanceof Map) {
+        log.info("query from ${request.remoteAddr} - found matching File for key: $key")
         byte[] file = value.content.bytes
         response.setContentType("application/octet-stream")
         response.setHeader("Content-disposition", "attachment;filename=${value.filename}")
@@ -58,6 +62,7 @@ class QueryController {
         response.outputStream << file
       }
       else {
+        log.info("query from ${request.remoteAddr} - found value for key: $key")
         render(text:value, contentType: 'text/plain')
       }
     }
@@ -73,11 +78,13 @@ class QueryController {
       //get the hostname of the requester without the domainname
       def host = nameResolutionService.getHostnameFromIP(request.remoteAddr)
       values = fileSystemTreeService.listValues(host, params.addition) 
+      log.info("list request from ${request.remoteAddr} - resolved to hostname: $host")
       //in case we didn't find anything for the given host
       if(!values) {
         //try with the fully qualified hostname
         def fqdn = nameResolutionService.getHostnameFromIP(request.remoteAddr, false)
         values = fileSystemTreeService.listValues(fqdn, params.addition)
+        log.info("list request from ${request.remoteAddr} - no values found for host: $host. Now trying with fqdn: $fqdn")
       }
     }
     else {
@@ -85,16 +92,19 @@ class QueryController {
       if (allowedProxies.contains(request.remoteAddr) ||
           allowedProxies.contains(nameResolutionService.getHostnameFromIP(request.remoteAddr, false))) {
         values = fileSystemTreeService.listValues(params.host, params.addition)
+        log.info("list request from ${request.remoteAddr} - received list request from allowed Proxy for host: ${params.host}")
       }
       else {
-        log.error("received proxied query from unauthorized host ${request.remoteAddr} (key=$key)")
+        log.error("list request from ${request.remoteAddr} - received proxied list request from unauthorized host ${request.remoteAddr}")
         render(status:403, text: "Querying host (${request.remoteAddr}) not configured as trusted proxy server.")
       }
     }
     if (!values) {
-      render(status:404, text: "No value found for the queried host")
+      log.info("list request from ${request.remoteAddr} - no values found for given host")
+      render(status:404, text: "No values found for host with IP ${request.remoteAddr}. It this IP resolvable by a DNS reverse lookup from the Getch host?")
     } 
     else {
+      log.info("list request from ${request.remoteAddr} - found values and returning them to the querying host")
       //iterate over the returned map and change some values
       values = values?.collectEntries { key, value ->
         def newValue
@@ -115,8 +125,7 @@ class QueryController {
 
       withFormat {
         html { render(text:values.collect{key, value -> "${key}=${value}"}.join('\n'), contentType: "text/plain") }
-        json { render books as JSON }
-        xml { render books as XML }
+        json { render values as JSON }
       }
     }
   }
