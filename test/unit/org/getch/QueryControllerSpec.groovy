@@ -133,4 +133,76 @@ testkey56=appvalue
       'web' || 'webvalue'
       'app' || 'appvalue'
   }
+
+  void "test create value for localhost without filename"() {
+    setup:
+    controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
+    controller.nameResolutionService = new NameResolutionService()
+    def directory1 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/localhost/')
+    directory1.mkdirs()
+    when:
+    request.remoteAddr = '127.0.0.1'
+    request.method = 'POST'
+    controller.create("testkey121", "testvalue121")
+    then:
+    response.status == 200
+    //check if the result was written to the 'default' file names config.properties
+    new File(directory1, 'config.properties').text.contains("testkey121=testvalue121")
+  }
+
+  void "test create value for localhost without filename and existing confi.properties"() {
+    setup:
+    controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
+    controller.nameResolutionService = new NameResolutionService()
+    def directory1 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/localhost/')
+    directory1.mkdirs()
+    new File(directory1, 'config.properties').text = '''textkey=testvalue
+testkey2=testvalue2'''
+    when:
+    request.remoteAddr = '127.0.0.1'
+    request.method = 'POST'
+    controller.create("testkey122", "testvalue122")
+    then:
+    response.status == 200
+    //check if the result was written to the 'default' file names config.properties
+    //the result is expected to be alpabetically sorted
+    new File(directory1, 'config.properties').text.contains('textkey=testvalue\ntestkey122=testvalue122\ntestkey2=testvalue2')
+  }
+
+  void "test create value for localhost with filename"() {
+    setup:
+    controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
+    controller.nameResolutionService = new NameResolutionService()
+    def directory1 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/localhost/')
+    directory1.mkdirs()
+    when:
+    request.remoteAddr = '127.0.0.1'
+    request.method = 'POST'
+    params.filename= 'blah.properties'
+    controller.create("testkey123", "testvalue123")
+    then:
+    response.status == 200
+    //check if the result was written to the 'default' file names config.properties
+    new File(directory1, 'blah.properties').text.contains("testkey123=testvalue123")
+  }
+
+  void "test create value with filename and addition"() {
+    setup:
+    controller.fileSystemTreeService = new FileSystemTreeService(grailsApplication:grailsApplication) 
+    controller.nameResolutionService = new NameResolutionService()
+    def directory1 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/localhost/')
+    directory1.mkdirs()
+    def directory2 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/app/localhost/')
+    directory2.mkdirs()
+    when:
+    request.remoteAddr = '127.0.0.1'
+    request.method = 'POST'
+    params.filename= 'blah.properties'
+    params.addition = 'app'
+    controller.create("testkey124", "testvalue124")
+    then:
+    response.status == 200
+    //check if the result was written to the 'default' file names config.properties
+    new File(directory2, 'blah.properties').text.contains("testkey124=testvalue124")
+  }
 }

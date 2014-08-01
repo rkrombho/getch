@@ -10,7 +10,7 @@ package org.getch
 class FileReaderFactory {
 
   public static FileReader createNewInstance() {
-    //currently we only have one implementation
+    //currently we support Properties and YAML files
     return new PropertyFileReader(new YamlFileReader())
   }
 }

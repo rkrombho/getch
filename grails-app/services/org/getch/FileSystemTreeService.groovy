@@ -232,6 +232,31 @@ class FileSystemTreeService {
     }
 
    /**
+    * Writes a value into the directory of the given host with the given filename
+    *
+    * @param host the Hostname to write the value for
+    * @param key the Key to write the value for
+    * @param value the Value to be written
+    * @param filename (optional) the filename to write too
+    * @param addition (optional) an addition in case the host occurs multiple times in the tree
+    */
+   public void writeValue(String host, String key, String value, String filename, String addition = null) {
+     //find the directory of of the given host
+     File hostDir = findStartDir(host, addition)
+     if (!hostDir) {
+       throw new HostDirNotFoundException(host)
+     }
+     if (!filename) {
+       filename = grailsApplication.config.getch.create.filename ?: 'config.properties'
+     }
+     File targetFile = new File(hostDir, filename)
+     //Initialize the file writer. This delegates reading to the correct reader implmentation based on the filename suffix
+     FileWriter writer = FileWriterFactory.createNewInstance()
+     //Write the given value
+     writer.writeValue(targetFile, key, value)
+   }
+
+   /**
     * Recursive helper method that searches for a file by name upwards in the tree
     * @returns a File object (if found) or null
     */ 

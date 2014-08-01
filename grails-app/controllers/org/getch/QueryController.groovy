@@ -12,7 +12,7 @@ class QueryController {
   def fileSystemTreeService
   def nameResolutionService
   static defaultAction = "query"
-  static allowedMethods = [query:'GET', list:'GET']
+  static allowedMethods = [query:'GET', list:'GET', create:'POST']
 
   /**
    * queries a single value from the hierarchy
@@ -127,5 +127,31 @@ class QueryController {
         json { render values as JSON }
       }
     }
+  }
+
+  def create(String key, String value) {
+    def host
+    //try with the requesters IP/hostname if no param is given
+    if (!params.host) {
+      //get the hostname of the requester without the domainname
+      host = nameResolutionService.getHostnameFromIP(request.remoteAddr)
+    }
+    else {
+      if (allowedProxies.contains(request.remoteAddr) ||
+          allowedProxies.contains(nameResolutionService.getHostnameFromIP(request.remoteAddr, false))) {
+        host = params.host
+      }
+    }
+    try {
+      fileSystemTreeService.writeValue(host, key, value, params.filename, params.addition)
+    }
+    catch (HostDirNotFoundException e) {
+      log.error("create request from ${request.remoteAddr} - no directory called $host found in hierarchy")
+      render(status: 404, text: e.message)
+      return
+    }
+    log.info("create request from ${request.remoteAddr} - successfully written")
+    //if we reach this withou an exception bubbeling up than we can render a 200
+    render(status:200)
   }
 }
