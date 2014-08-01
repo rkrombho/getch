@@ -36,11 +36,11 @@ class FileSystemTreeService {
         File file = searchFile(startDir, key)
         //if the key matches a filename in the tree
         if(file) {
-          //prepare the binding by listing all values of the tree
-          def binding = listValues(fromDir)
           def content
-          //only if the templating feature is enabled
-          if(grailsApplication.config.getch.feature.templating.enabled) {
+          //check if the file should be treated as template or as normal file
+          if(treatAsTemplate(file) && grailsApplication.config.getch.feature.templating.enabled) {
+            //prepare the binding by listing all values of the tree
+            def binding = listValues(fromDir)
             content = resolveTemplateFile(file, binding)
           }
           else {
@@ -321,4 +321,22 @@ class FileSystemTreeService {
     }
     return startDir
   }
+
+  /**
+   * Private methd that checks for a specific File if it should be resolved by the template engine.
+   * It does it by searching for a file called '.getchignore' in the directory of the given file.
+   * If this file contains a line with the name of the given file than the result is 'false'
+   *
+   * @param file The File to be checked
+   */
+  public boolean treatAsTemplate(File file) {
+    File getchIgnore = new File(file.parent, '.getchignore')
+    if(getchIgnore.exists() && getchIgnore.text.contains(file.name)) {
+      return false
+    }
+    else {
+      return true 
+    }
+  }
+
 }

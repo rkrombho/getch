@@ -222,8 +222,28 @@ test1=testvalue1
 test2=testvalue2
 test3=a,b,c
 '''
-
      ]
-  
+   }
+
+   void "test templates don't get resolved when .getchignore file contains the filename"() {
+     setup:
+     def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+     def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/component1/')
+     directory.mkdirs()
+     new File(directory, 'test.conf').text = '''
+test1=testvalue
+test2=<%= testkey101 %>
+'''
+     new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/conventions.yaml').text = '''
+testkey101: testvalue1'''
+     new File(directory, '.getchignore').text = 'test.conf'
+     expect:
+     service.findValue('hostname1', 'test.conf') == [
+       'filename' : 'test.conf',
+       'content' : '''
+test1=testvalue
+test2=<%= testkey101 %>
+'''
+     ]
    }
 }
