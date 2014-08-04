@@ -28,7 +28,7 @@ EOF > ~/.getch.groovy
 java -Dgetch.config.location=~/.getch.groovy -jar getch-$GETCH_VERSION.jar port=$BIND_PORT host=$HOSTNAME
 ```
 
-# Use Getch
+## Use Getch
 ```bash
 # create a sample hierarchy 
 mkdir -p $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/HOSTNAME
