@@ -10,6 +10,7 @@ This project is in a very early protptype state. Please don't use it anywhere ne
 
 Quick Start
 ===========
+## Run Getch
 ```bash
 GETCH_VERSION="x.x.x"
 HIERARCHY_BASE=<path_to_getch_hierarchy_base_dir>
@@ -25,6 +26,10 @@ getch.encryption.password = '<password_for_encryption>'
 EOF > ~/.getch.groovy
 # run the embedded servlet container
 java -Dgetch.config.location=~/.getch.groovy -jar getch-$GETCH_VERSION.jar port=$BIND_PORT host=$HOSTNAME
+```
+
+# Use Getch
+```bash
 # create a sample hierarchy 
 mkdir -p $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/HOSTNAME
 # create a sample key=value file
@@ -33,7 +38,6 @@ echo "testkey=testvalue" > $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/
 curl -i <dnsresolvable_interface_name> -X GET http://$HOSTNAME:$BIND_PORT/getch/testkey
 # list all values
 curl -i <dnsresolvable_interface_name> -X GET http://$HOSTNAME:$BIND_PORT/getch/list
-
 ``` 
 
 Documentation
