@@ -6,7 +6,7 @@ Getch is a very minimalistic and simple hierarchical configuration store queryab
 
 Project Status
 ==============
-This project is in a very early protptype state. Please don't use it anywhere near a productive environment.
+The project is still in a very early stage but all existing features are stable and tested in a productive environment.
 
 Quick Start
 ===========
