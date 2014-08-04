@@ -40,7 +40,7 @@ class FileSystemTreeService {
           //check if the file should be treated as template or as normal file
           if(treatAsTemplate(file) && grailsApplication.config.getch.feature.templating.enabled) {
             //prepare the binding by listing all values of the tree
-            def binding = listValues(fromDir)
+            def binding = listValues(fromDir, addition)
             content = resolveTemplateFile(file, binding)
           }
           else {
