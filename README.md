@@ -45,7 +45,7 @@ echo "MyDirective ${teskey}" > $HIERARCHY_BASE/myorg/myservice/my.conf
 # query the templated file
 curl -i <dnsresolvable_interface_name> -X GET -O http://$HOSTNAME:$BIND_PORT/getch/my.conf
 cat my.conf
-> MyDirective ${teskey}
+> MyDirective testvalue
 ``` 
 
 Documentation
