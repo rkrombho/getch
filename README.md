@@ -2,7 +2,7 @@
 [![Stories in Ready](https://badge.waffle.io/rkrombho/getch.png?label=ready&title=Ready)](https://waffle.io/rkrombho/getch)
 Getch
 =====
-Getch is a very minimalistic and simple hierarchical configuration store queryable via HTTP.
+Getch is a very minimalistic and simple hierarchical configuration store and template-engine queryable via HTTP.
 
 Project Status
 ==============
@@ -36,10 +36,17 @@ mkdir -p $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/HOSTNAME
 echo "testkey=testvalue" > $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/$HOSTNAME/config.properties
 # query the value we just created
 curl -i <dnsresolvable_interface_name> -X GET http://$HOSTNAME:$BIND_PORT/getch/testkey
+> testvalue
 # list all values
 curl -i <dnsresolvable_interface_name> -X GET http://$HOSTNAME:$BIND_PORT/getch/list
+> textkey=testvalue
+# create a template file
+echo "MyDirective ${teskey}" > $HIERARCHY_BASE/myorg/myservice/my.conf
+# query the templated file
+curl -i <dnsresolvable_interface_name> -X GET http://$HOSTNAME:$BIND_PORT/getch/my.conf
+> MyDirective testvalue
 ``` 
 
 Documentation
 =============
-For more detailed documentation please browse the [Getch wiki](https://github.com/rkrombho/getch/wiki)
+For a more detailed documentation and description of all features please browse the [Getch wiki](https://github.com/rkrombho/getch/wiki)
