@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Getch - A simple hierarchical configuration store</title>
+    <title>Getch by rkrombho</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -16,7 +16,7 @@
     <div class="wrapper">
       <header>
         <h1>Getch</h1>
-        <p>A hierarchical configuration store and template engine queryable over HTTP.</p>
+        <p>A simple hierarchical configuration store and template engine queryable over HTTP.</p>
 
         <p class="view"><a href="https://github.com/rkrombho/getch">View the Project on GitHub <small>rkrombho/getch</small></a></p>
 
@@ -49,36 +49,45 @@
 <div class="highlight highlight-bash"><pre><span class="nv">GETCH_VERSION</span><span class="o">=</span><span class="s2">"x.x.x"</span>
 <span class="nv">HIERARCHY_BASE</span><span class="o">=</span>&lt;path_to_getch_hierarchy_base_dir&gt;
 <span class="nv">HOSTNAME</span><span class="o">=</span>&lt;dns_resolable_hostname&gt;
+<span class="nv">ENCRYPTION_PASSWORD</span><span class="o">=</span>&lt;secret&gt;
 <span class="nv">BIND_PORT</span><span class="o">=</span>8080
 
 <span class="c"># download the standalone jar</span>
-curl -O https://github.com/rkrombho/getch/releases/download/0.0.1/getch-<span class="nv">$GETCH_VERSION</span>.jar
+curl -L -O https://github.com/rkrombho/getch/releases/download/<span class="nv">$GETCH_VERSION</span>/getch-<span class="nv">$GETCH_VERSION</span>.jar
 <span class="c"># create a config file</span>
-cat <span class="s">&lt;&lt;EOF</span>
-<span class="s">getch.base.directory = '&lt;path_to_getch_hierarchy_base_dir&gt;'</span>
-<span class="s">getch.encryption.password = '&lt;password_for_encryption&gt;'</span>
-<span class="s">EOF</span> &gt; ~/.getch.groovy
+mkdir ~/.getch
+<span class="o">(</span>
+cat <span class="s">&lt;&lt;EOF                     </span>
+<span class="s">getch.base.directory = '$HIERARCHY_BASE'</span>
+<span class="s">getch.encryption.password = '$ENCRYPTION_PASSWORD'</span>
+<span class="s">getch.trusted.proxies = [ '127.0.0.1' ]</span>
+<span class="s">getch.feature.templating.enabled = true</span>
+<span class="s">EOF</span>
+<span class="o">)</span> &gt; ~/.getch/getch.groovy
 <span class="c"># run the embedded servlet container</span>
-java -Dgetch.config.location<span class="o">=</span>~/.getch.groovy -jar getch-<span class="nv">$GETCH_VERSION</span>.jar <span class="nv">port</span><span class="o">=</span><span class="nv">$BIND_PORT</span> <span class="nv">host</span><span class="o">=</span><span class="nv">$HOSTNAME</span>
+java -jar getch-<span class="nv">$GETCH_VERSION</span>.jar <span class="nv">port</span><span class="o">=</span><span class="nv">$BIND_PORT</span> <span class="nv">host</span><span class="o">=</span><span class="nv">$HOSTNAME</span>
 </pre></div>
 
 <h2>
 <a name="use-getch" class="anchor" href="#use-getch"><span class="octicon octicon-link"></span></a>Use Getch</h2>
 
-<div class="highlight highlight-bash"><pre><span class="c"># create a sample hierarchy </span>
-mkdir -p <span class="nv">$HIERARCHY_BASE</span>/myorg/myservice/myenvironment/mytier/HOSTNAME
+<div class="highlight highlight-bash"><pre><span class="nv">HIERARCHY_BASE</span><span class="o">=</span>&lt;path_to_getch_hierarchy_base_dir&gt;
+<span class="nv">HOSTNAME</span><span class="o">=</span>&lt;dns_resolable_hostname&gt;
+<span class="nv">BIND_PORT</span><span class="o">=</span>8080
+<span class="c"># create a sample hierarchy </span>
+mkdir -p <span class="nv">$HIERARCHY_BASE</span>/myorg/myservice/myenvironment/mytier/<span class="nv">$HOSTNAME</span>
 <span class="c"># create a sample key=value file</span>
 <span class="nb">echo</span> <span class="s2">"testkey=testvalue"</span> &gt; <span class="nv">$HIERARCHY_BASE</span>/myorg/myservice/myenvironment/mytier/<span class="nv">$HOSTNAME</span>/config.properties
-<span class="c"># query the value we just created</span>
-curl -i &lt;dnsresolvable_interface_name&gt; -X GET http://<span class="nv">$HOSTNAME</span>:<span class="nv">$BIND_PORT</span>/getch/testkey
+<span class="c"># query the value we just created (note: your default network interface must DNS resolve to $HOSTNAME)</span>
+curl -X GET http://<span class="nv">$HOSTNAME</span>:<span class="nv">$BIND_PORT</span>/testkey
 &gt; testvalue
 <span class="c"># list all values</span>
-curl -i &lt;dnsresolvable_interface_name&gt; -X GET http://<span class="nv">$HOSTNAME</span>:<span class="nv">$BIND_PORT</span>/getch/list
+curl -X GET http://<span class="nv">$HOSTNAME</span>:<span class="nv">$BIND_PORT</span>/list
 &gt; <span class="nv">textkey</span><span class="o">=</span>testvalue
 <span class="c"># create a template file</span>
-<span class="nb">echo</span> <span class="s2">"MyDirective ${teskey}"</span> &gt; <span class="nv">$HIERARCHY_BASE</span>/myorg/myservice/my.conf
+<span class="nb">echo</span> <span class="s2">"MyDirective \${testkey}"</span> &gt; <span class="nv">$HIERARCHY_BASE</span>/myorg/myservice/my.conf
 <span class="c"># query the templated file</span>
-curl -i &lt;dnsresolvable_interface_name&gt; -X GET -O http://<span class="nv">$HOSTNAME</span>:<span class="nv">$BIND_PORT</span>/getch/my.conf
+curl -X GET -O http://<span class="nv">$HOSTNAME</span>:<span class="nv">$BIND_PORT</span>/my.conf
 cat my.conf
 &gt; MyDirective testvalue
 </pre></div>
@@ -94,14 +103,16 @@ cat my.conf
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      
-      ga('create', 'UA-53588954-1', 'auto');
-      ga('send', 'pageview');
-    </script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-53588954-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
   </body>
 </html>
