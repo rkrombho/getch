@@ -16,35 +16,44 @@ Quick Start
 GETCH_VERSION="x.x.x"
 HIERARCHY_BASE=<path_to_getch_hierarchy_base_dir>
 HOSTNAME=<dns_resolable_hostname>
+ENCRYPTION_PASSWORD=<secret>
 BIND_PORT=8080
 
 # download the standalone jar
-curl -O https://github.com/rkrombho/getch/releases/download/0.0.1/getch-$GETCH_VERSION.jar
+curl -L -O https://github.com/rkrombho/getch/releases/download/$GETCH_VERSION/getch-$GETCH_VERSION.jar
 # create a config file
-cat <<EOF
-getch.base.directory = '<path_to_getch_hierarchy_base_dir>'
-getch.encryption.password = '<password_for_encryption>'
-EOF > ~/.getch.groovy
+mkdir ~/.getch
+(
+cat <<EOF                     
+getch.base.directory = '$HIERARCHY_BASE'
+getch.encryption.password = '$ENCRYPTION_PASSWORD'
+getch.trusted.proxies = [ '127.0.0.1' ]
+getch.feature.templating.enabled = true
+EOF
+) > ~/.getch/getch.groovy
 # run the embedded servlet container
-java -Dgetch.config.location=~/.getch.groovy -jar getch-$GETCH_VERSION.jar port=$BIND_PORT host=$HOSTNAME
+java -jar getch-$GETCH_VERSION.jar port=$BIND_PORT host=$HOSTNAME
 ```
 
 ## Use Getch
 ```bash
+HIERARCHY_BASE=<path_to_getch_hierarchy_base_dir>
+HOSTNAME=<dns_resolable_hostname>
+BIND_PORT=8080
 # create a sample hierarchy 
-mkdir -p $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/HOSTNAME
+mkdir -p $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/$HOSTNAME
 # create a sample key=value file
 echo "testkey=testvalue" > $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/$HOSTNAME/config.properties
-# query the value we just created
-curl -i <dnsresolvable_interface_name> -X GET http://$HOSTNAME:$BIND_PORT/getch/testkey
+# query the value we just created (note: your default network interface must DNS resolve to $HOSTNAME)
+curl -X GET http://$HOSTNAME:$BIND_PORT/testkey
 > testvalue
 # list all values
-curl -i <dnsresolvable_interface_name> -X GET http://$HOSTNAME:$BIND_PORT/getch/list
+curl -X GET http://$HOSTNAME:$BIND_PORT/list
 > textkey=testvalue
 # create a template file
-echo "MyDirective ${teskey}" > $HIERARCHY_BASE/myorg/myservice/my.conf
+echo "MyDirective \${testkey}" > $HIERARCHY_BASE/myorg/myservice/my.conf
 # query the templated file
-curl -i <dnsresolvable_interface_name> -X GET -O http://$HOSTNAME:$BIND_PORT/getch/my.conf
+curl -X GET -O http://$HOSTNAME:$BIND_PORT/my.conf
 cat my.conf
 > MyDirective testvalue
 ``` 
