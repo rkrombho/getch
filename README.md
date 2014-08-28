@@ -58,7 +58,7 @@ cat my.conf
 > MyDirective testvalue
 ``` 
 
-*Note:* There is also a command line client available for Getch called [getchctl](https://github.com/rkrombho/getchctl) which supports the majority of the features that Getch pffers. It's available for Windows and Linux, for i386 and amd64 architectures. 
+**Note:** There is also a command line client available for Getch called [getchctl](https://github.com/rkrombho/getchctl) which supports the majority of the features that Getch pffers. It's available for Windows and Linux, for i386 and amd64 architectures. 
 
 
 Documentation
