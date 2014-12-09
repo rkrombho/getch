@@ -283,7 +283,15 @@ class FileSystemTreeService {
     */
    private String resolveTemplateFile(File template, Map binding) {
      def engine = new SimpleTemplateEngine()
-     engine.createTemplate(template).make(binding).toString()
+     def fileContent = engine.createTemplate(template).make(binding).toString()
+     //sadly the SimpleTemplateEngine always writes \n. 
+     //If we work with Windows based files, this is not what we want.
+     if(template.text.contains('\r\n')) {
+       return fileContent.replaceAll('\n', '\r\n')
+     }
+     else {
+       return fileContent
+     }
    }
 
    /**

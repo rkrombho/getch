@@ -246,4 +246,19 @@ test2=<%= testkey101 %>
 '''
      ]
    }
+
+   void "test if eol-style is preserved as in the original file"() {
+     setup:
+     def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+     def directory = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/')
+     directory.mkdirs()
+     def windowsFile = new File(directory, 'windows-eol')
+     def linuxFile = new File(directory, 'linux-eol')
+     windowsFile.text = 'line1\r\nline2\r\nline3'
+     linuxFile.text = 'line1\nline2\nline3'
+     
+     expect:
+     service.resolveTemplateFile(windowsFile, [:]) == 'line1\r\nline2\r\nline3'
+     service.resolveTemplateFile(linuxFile, [:]) == 'line1\nline2\nline3'
+   }
 }
