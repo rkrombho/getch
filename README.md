@@ -12,6 +12,11 @@ The project is still in a very early stage but all existing features are stable 
 Quick Start
 ===========
 ## Run Getch
+
+### Docker
+Checkout the [Getch Docker image](https://registry.hub.docker.com/u/rkrombho/getch/)
+
+### Manually
 ```bash
 GETCH_VERSION="x.x.x"
 HIERARCHY_BASE=<path_to_getch_hierarchy_base_dir>
