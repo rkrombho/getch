@@ -260,5 +260,32 @@ test2=<%= testkey101 %>
      expect:
      service.resolveTemplateFile(windowsFile, [:]) == 'line1\r\nline2\r\nline3'
      service.resolveTemplateFile(linuxFile, [:]) == 'line1\nline2\nline3'
-   }
+    }
+
+    void "test query YAML sub-keys"(String host, String key, String value) {
+      setup:
+      def service = new FileSystemTreeService(grailsApplication:grailsApplication)
+      def directory1 = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/')
+      directory1.mkdirs()
+      def yamlFile = new File(grailsApplication.config.getch.base.directory + '/common/dc1/mydepartment/myproduct/web/hostname1/config.yaml')
+      yamlFile.text='''
+a:
+  b: valueb
+  c: valuec
+  d:
+    - e
+    - f
+    - g
+  h:
+    i: valuei
+'''
+      expect:
+      service.findValue(host, key) == value
+      where:
+      host | key || value 
+      'hostname1' | 'a.b' || 'valueb'
+      'hostname1' | 'a.c' || 'valuec'
+      'hostname1' | 'a.d' || 'e,f,g'
+      'hostname1' | 'a.h.i' || 'valuei'
+    }
 }

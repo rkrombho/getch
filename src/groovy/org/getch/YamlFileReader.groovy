@@ -24,7 +24,13 @@ class YamlFileReader implements FileReader {
   public String getValueForKey(File file, String key) {
     if (file.name.endsWith('.yaml') || file.name.endsWith('.yml')) {
       def yaml = Yaml.load(file)
-      def value = yaml."$key"
+      //make sub-objects queryable
+      def splittedKeys = key.split('\\.')
+      def value = yaml
+      splittedKeys.each { currentKey ->
+        value = value.getAt(currentKey)
+      }
+      //def value = yaml."$key"
       //if the key references a collection than join this with a ,
       return value instanceof Collection ? value.join(',') : value
     }
