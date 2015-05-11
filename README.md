@@ -12,12 +12,17 @@ The project is still in a very early stage but all existing features are stable 
 Quick Start
 ===========
 ## Run Getch
+
+### Docker
+Checkout the [Getch Docker image](https://registry.hub.docker.com/u/rkrombho/getch/)
+
+### Manually
 ```bash
 GETCH_VERSION="x.x.x"
 HIERARCHY_BASE=<path_to_getch_hierarchy_base_dir>
 HOSTNAME=<dns_resolable_hostname>
 ENCRYPTION_PASSWORD=<secret>
-BIND_PORT=8080
+BIND_PORT=4382
 
 # download the standalone jar
 curl -L -O https://github.com/rkrombho/getch/releases/download/$GETCH_VERSION/getch-$GETCH_VERSION.jar
@@ -39,7 +44,7 @@ java -jar getch-$GETCH_VERSION.jar port=$BIND_PORT host=$HOSTNAME
 ```bash
 HIERARCHY_BASE=<path_to_getch_hierarchy_base_dir>
 HOSTNAME=<dns_resolable_hostname>
-BIND_PORT=8080
+BIND_PORT=4382
 # create a sample hierarchy 
 mkdir -p $HIERARCHY_BASE/myorg/myservice/myenvironment/mytier/$HOSTNAME
 # create a sample key=value file
